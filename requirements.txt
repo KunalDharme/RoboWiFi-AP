@@ -1,0 +1,198 @@
+# WiFi Security Testing Tool - System Requirements
+# 
+# LEGAL WARNING: Use only with written authorization
+# Unauthorized wireless network testing is illegal
+#
+# Installation: 
+#   Debian/Ubuntu: sudo apt-get install -y $(cat requirements.txt | grep -v '^#')
+#   Or use the installation script below
+
+# Core Dependencies (REQUIRED)
+hostapd                  # Host access point daemon (AP mode)
+dnsmasq                  # DNS/DHCP server for client connectivity
+iptables                 # Firewall and NAT configuration
+iw                       # Wireless configuration utility
+wireless-tools           # Legacy wireless tools (iwconfig, etc.)
+net-tools                # Network configuration (ifconfig, route)
+
+# For Password Capture Mode (OPTIONAL)
+# Only install if you have authorization for credential testing
+hostapd-wpe             # WPE version for credential harvesting
+
+# Security & Logging (RECOMMENDED)
+gpg                      # Encryption for captured credentials
+auditd                   # System audit logging
+rsyslog                  # System logging
+
+# Additional Utilities (RECOMMENDED)
+aircrack-ng              # Wireless security auditing suite
+macchanger               # MAC address management
+tcpdump                  # Packet capture for analysis
+wireshark-cli            # Network protocol analyzer (tshark)
+
+# System Libraries
+libnl-3-dev              # Netlink library
+libnl-genl-3-dev         # Generic netlink library
+
+# =====================================
+# INSTALLATION SCRIPT
+# =====================================
+# Save as: install_dependencies.sh
+# Usage: sudo bash install_dependencies.sh
+
+#!/bin/bash
+# Automated dependency installer
+# Run with: sudo bash install_dependencies.sh
+
+set -e
+
+echo "=== WiFi Security Testing Tool - Dependency Installer ==="
+echo ""
+echo "WARNING: This tool is for AUTHORIZED testing only."
+echo "Illegal use may violate federal and state laws."
+echo ""
+read -p "Do you have authorization to install and use this tool? (yes/no): " AUTH
+
+if [[ "$AUTH" != "yes" ]]; then
+    echo "Installation cancelled."
+    exit 1
+fi
+
+echo ""
+echo "Updating package lists..."
+apt-get update
+
+echo ""
+echo "Installing core dependencies..."
+apt-get install -y \
+    hostapd \
+    dnsmasq \
+    iptables \
+    iw \
+    wireless-tools \
+    net-tools \
+    gpg \
+    auditd \
+    rsyslog
+
+echo ""
+read -p "Install hostapd-wpe for password capture testing? (yes/no): " INSTALL_WPE
+
+if [[ "$INSTALL_WPE" == "yes" ]]; then
+    echo "Installing hostapd-wpe..."
+    apt-get install -y hostapd-wpe
+    echo "⚠️  Password capture mode enabled - use responsibly!"
+fi
+
+echo ""
+read -p "Install additional security tools? (aircrack-ng, tcpdump, etc.) (yes/no): " INSTALL_EXTRA
+
+if [[ "$INSTALL_EXTRA" == "yes" ]]; then
+    echo "Installing additional tools..."
+    apt-get install -y \
+        aircrack-ng \
+        macchanger \
+        tcpdump \
+        wireshark-cli \
+        libnl-3-dev \
+        libnl-genl-3-dev
+fi
+
+echo ""
+echo "✅ Installation complete!"
+echo ""
+echo "Next steps:"
+echo "1. Review the README.md for usage instructions"
+echo "2. Read ETHICAL_USE.md for legal and ethical guidelines"
+echo "3. Verify your wireless adapter supports AP mode:"
+echo "   iw list | grep -A 10 'Supported interface modes'"
+echo ""
+echo "Remember: Always obtain written authorization before testing!"
+
+# =====================================
+# HARDWARE REQUIREMENTS
+# =====================================
+#
+# Wireless Adapter Requirements:
+#   - Must support AP (Access Point) mode
+#   - Must support monitor mode (recommended)
+#   - Chipsets known to work:
+#     * Atheros AR9271
+#     * Ralink RT3070/RT5370/RT5572
+#     * Realtek RTL8812AU
+#     * Some Intel wireless cards
+#
+# Check compatibility:
+#   iw list | grep "Supported interface modes"
+#
+# System Requirements:
+#   - Linux kernel 3.0+
+#   - Root/sudo access
+#   - 2GB+ RAM
+#   - 1GB+ free disk space
+
+# =====================================
+# VERIFICATION
+# =====================================
+#
+# After installation, verify with:
+#
+#   which hostapd         # Should show: /usr/sbin/hostapd
+#   which dnsmasq         # Should show: /usr/sbin/dnsmasq
+#   which iw              # Should show: /usr/sbin/iw
+#   iw list | grep "AP"   # Should show AP in supported modes
+#
+# Test wireless adapter:
+#   sudo iw dev
+#   sudo iw list
+#
+# If hostapd-wpe installed:
+#   which hostapd-wpe     # Should show path
+#   ls /etc/hostapd-wpe/  # Should contain certificate files
+
+# =====================================
+# TROUBLESHOOTING
+# =====================================
+#
+# If installation fails:
+#
+# 1. Update sources:
+#    sudo apt-get update
+#    sudo apt-get upgrade
+#
+# 2. For hostapd-wpe on Ubuntu:
+#    sudo add-apt-repository universe
+#    sudo apt-get update
+#    sudo apt-get install hostapd-wpe
+#
+# 3. For Kali Linux users:
+#    Most tools are pre-installed
+#    sudo apt-get install hostapd-wpe (if needed)
+#
+# 4. Check kernel modules:
+#    lsmod | grep mac80211
+#    lsmod | grep cfg80211
+#
+# 5. Verify network manager not interfering:
+#    sudo systemctl stop NetworkManager
+#    sudo systemctl stop wpa_supplicant
+
+# =====================================
+# OPERATING SYSTEM COMPATIBILITY
+# =====================================
+#
+# Tested on:
+#   ✅ Ubuntu 20.04 LTS, 22.04 LTS
+#   ✅ Debian 11 (Bullseye), 12 (Bookworm)
+#   ✅ Kali Linux 2023.x+
+#   ✅ ParrotOS 5.x+
+#
+# May work on:
+#   ⚠️  Fedora/RHEL (use dnf/yum instead of apt)
+#   ⚠️  Arch Linux (use pacman)
+#   ⚠️  Raspberry Pi OS
+#
+# Not supported:
+#   ❌ Windows (use WSL2 with USB passthrough)
+#   ❌ macOS (limited AP mode support)
+#   ❌ Android/iOS
