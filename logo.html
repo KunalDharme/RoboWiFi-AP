@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RoboWiFi-AP Logo</title>
+<style>
+    body {
+        background: #0b0b0b;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: "Courier New", monospace;
+    }
+
+    .logo {
+        text-align: center;
+        color: #ff2b2b;
+        text-shadow:
+            0 0 6px #ff2b2b,
+            0 0 16px #b30000,
+            0 0 30px #660000;
+    }
+
+    .title {
+        font-size: 64px;
+        font-weight: bold;
+        letter-spacing: 4px;
+    }
+
+    .ap {
+        font-size: 26px;
+        letter-spacing: 6px;
+        margin-top: 6px;
+        color: #ff6666;
+    }
+
+    /* WiFi Symbol */
+    .wifi {
+        margin: 25px auto 10px;
+        width: 80px;
+        height: 50px;
+        position: relative;
+    }
+
+    .wifi span {
+        position: absolute;
+        border: 4px solid transparent;
+        border-top: 4px solid #ff2b2b;
+        border-radius: 50%;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: pulse 1.5s infinite;
+        box-shadow: 0 0 10px #ff0000;
+    }
+
+    .wifi span:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        top: 0;
+
+    }
+
+    .wifi span:nth-child(2) {
+        width: 55px;
+        height: 55px;
+        top: 12px;
+    }
+
+    .wifi span:nth-child(3) {
+        width: 30px;
+        height: 30px;
+        top: 24px;
+    }
+
+    .wifi .dot {
+        width: 10px;
+        height: 10px;
+        background: #ff2b2b;
+        border-radius: 50%;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 0 12px #ff0000;
+    }
+
+    @keyframes pulse {
+        from { opacity: 0.3; }
+        to { opacity: 1; }
+    }
+
+    .tagline {
+        margin-top: 10px;
+        font-size: 14px;
+        letter-spacing: 2px;
+        color: #ff4444;
+    }
+</style>
+</head>
+<body>
+
+<div class="logo">
+    <div class="title">ROBO<span style="color:#ffffff">WIFI</span></div>
+    <div class="ap">— A P —</div>
+
+    <div class="wifi">
+        <span></span>
+        <span></span>
+        <span></span>
+        <div class="dot"></div>
+    </div>
+</div>
+
+</body>
+</html>
