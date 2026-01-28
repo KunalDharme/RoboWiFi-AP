@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# rogue_ap_detector.sh - Enhanced Rogue Access Point Detector & Defense System
+# fake_ap_detector.sh - Enhanced Rogue Access Point Detector & Defense System
 # Version 2.0 - Advanced threat detection and monitoring
 #
 # Usage:
-#   sudo ./rogue_ap_detector.sh --monitor [INTERFACE]
-#   sudo ./rogue_ap_detector.sh --scan
-#   sudo ./rogue_ap_detector.sh --protect SSID BSSID
-#   sudo ./rogue_ap_detector.sh --analyze LOGFILE
-#   sudo ./rogue_ap_detector.sh --help
+#   sudo ./fake_ap_detector.sh --monitor [INTERFACE]
+#   sudo ./fake_ap_detector.sh --scan
+#   sudo ./fake_ap_detector.sh --protect SSID BSSID
+#   sudo ./fake_ap_detector.sh --analyze LOGFILE
+#   sudo ./fake_ap_detector.sh --help
 
 set -euo pipefail
 
@@ -19,7 +19,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # ============================================================================
 
 # File Paths
-WORK_DIR="/tmp/rogue_ap_detector"
+WORK_DIR="/tmp/fake_ap_detector"
 SCAN_LOG="${WORK_DIR}/scan_results.log"
 ALERT_LOG="${WORK_DIR}/alerts.log"
 WHITELIST_FILE="${WORK_DIR}/whitelist.txt"
@@ -977,8 +977,13 @@ fingerprint_clients() {
         echo "$mac|$vendor|$(date)|$(date)|1|" >> "$CLIENT_TRACKING_DB"
         log_info "New client tracked: $mac ($vendor) - $hostname"
       else
-        # Update last seen
-        sed -i "s|^$mac|.*|$mac|$vendor|$(grep "^$mac|" "$CLIENT_TRACKING_DB" | cut -d'|' -f3)|$(date)|$(grep "^$mac|" "$CLIENT_TRACKING_DB" | cut -d'|' -f5)|" "$CLIENT_TRACKING_DB"
+        # Update last seen - FIXED: Properly escape pipes and use correct field extraction
+        local first_seen=$(grep "^$mac|" "$CLIENT_TRACKING_DB" | cut -d'|' -f3)
+        local probe_count=$(grep "^$mac|" "$CLIENT_TRACKING_DB" | cut -d'|' -f5)
+        # Remove old entry
+        sed -i "/^${mac}|/d" "$CLIENT_TRACKING_DB"
+        # Add updated entry
+        echo "$mac|$vendor|$first_seen|$(date)|$probe_count|" >> "$CLIENT_TRACKING_DB"
       fi
     done < /var/lib/misc/dnsmasq.leases
   fi
@@ -1456,8 +1461,13 @@ main() {
       local iface=$(get_wireless_interface "${2:-}")
       local interval="${3:-10}"
       
-      # Parse additional options
-      shift 2 2>/dev/null || true
+      # Parse additional options - FIXED: Better argument handling
+      if [[ $# -gt 2 ]]; then
+        shift 2
+      else
+        shift $#
+      fi
+      
       while [[ $# -gt 0 ]]; do
         case "$1" in
           --interval) interval="$2"; shift 2 ;;
