@@ -27,13 +27,13 @@ SCRIPT_DIR = Path(__file__).parent
 LOCAL_SCRIPTS = {
     "basic": SCRIPT_DIR / "scripts" / "fake_ap.sh",
     "advanced": SCRIPT_DIR / "scripts" / "advanced_fake_ap.sh",
-    "defender": SCRIPT_DIR / "scripts" / "fake_ap_detector.sh"
+    "defender": SCRIPT_DIR / "scripts" / "rogue_ap_detector.sh"
 }
 
 SCRIPT_NAMES = {
     "basic": "fake_ap.sh",
     "advanced": "advanced_fake_ap.sh",
-    "defender": "fake_ap_detector.sh"
+    "defender": "rogue_ap_detector.sh"
 }
 
 # Setup script path
@@ -479,7 +479,16 @@ def launch_script(script_path, script_type):
         print(f"{Fore.YELLOW}{'='*65}{Style.RESET_ALL}\n")
         input(f"{Fore.GREEN}Press ENTER to launch the script...{Style.RESET_ALL}")
         print()
-        os.execvp("bash", ["bash", script_path])
+        
+        # Run script and return to menu after
+        try:
+            subprocess.run(["bash", script_path], check=False)
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}Script interrupted by user.{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.CYAN}Script finished. Returning to main menu...{Style.RESET_ALL}")
+        input(f"{Fore.GREEN}Press ENTER to continue...{Style.RESET_ALL}")
+        return True
         
     elif script_type == 'advanced':
         print(f"{Fore.WHITE}TIP: Advanced usage example:")
@@ -488,7 +497,16 @@ def launch_script(script_path, script_type):
         print(f"{Fore.YELLOW}{'='*65}{Style.RESET_ALL}\n")
         input(f"{Fore.GREEN}Press ENTER to launch the script...{Style.RESET_ALL}")
         print()
-        os.execvp("bash", ["bash", script_path])
+        
+        # Run script and return to menu after
+        try:
+            subprocess.run(["bash", script_path], check=False)
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}Script interrupted by user.{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.CYAN}Script finished. Returning to main menu...{Style.RESET_ALL}")
+        input(f"{Fore.GREEN}Press ENTER to continue...{Style.RESET_ALL}")
+        return True
         
     elif script_type == 'defender':
         print(f"{Fore.WHITE}Defender Mode Options:{Style.RESET_ALL}")
@@ -496,16 +514,24 @@ def launch_script(script_path, script_type):
         print(f"{Fore.CYAN}  [2]{Fore.WHITE} Monitor Mode - Continuous monitoring")
         print(f"{Fore.CYAN}  [3]{Fore.WHITE} Custom Command - Enter your own arguments")
         print(f"{Fore.CYAN}  [4]{Fore.WHITE} Help - Show all available options")
+        print(f"{Fore.CYAN}  [5]{Fore.WHITE} Back to Main Menu")
         print(f"{Fore.YELLOW}{'='*65}{Style.RESET_ALL}\n")
         
         while True:
-            choice = input(f"{Fore.YELLOW}Select defender option [1-4]: {Style.RESET_ALL}").strip()
+            choice = input(f"{Fore.YELLOW}Select defender option [1-5]: {Style.RESET_ALL}").strip()
             
             if choice == '1':
                 # Quick scan
                 print(f"\n{Fore.GREEN}Starting quick scan for rogue APs...{Style.RESET_ALL}\n")
-                os.execvp("bash", ["bash", script_path, "--scan"])
-                break
+                try:
+                    subprocess.run(["bash", script_path, "--scan"], check=False)
+                except KeyboardInterrupt:
+                    print(f"\n{Fore.YELLOW}Scan interrupted by user.{Style.RESET_ALL}")
+                
+                print(f"\n{Fore.CYAN}Scan complete. Returning to main menu...{Style.RESET_ALL}")
+                input(f"{Fore.GREEN}Press ENTER to continue...{Style.RESET_ALL}")
+                return True
+                
             elif choice == '2':
                 # Monitor mode
                 print(f"\n{Fore.CYAN}Available wireless interfaces:{Style.RESET_ALL}")
@@ -523,17 +549,27 @@ def launch_script(script_path, script_type):
                         if not iface:
                             iface = interfaces[0]
                         print(f"\n{Fore.GREEN}Starting continuous monitoring on {iface}...{Style.RESET_ALL}\n")
-                        os.execvp("bash", ["bash", script_path, "--monitor", iface])
+                        
+                        try:
+                            subprocess.run(["bash", script_path, "--monitor", iface], check=False)
+                        except KeyboardInterrupt:
+                            print(f"\n{Fore.YELLOW}Monitoring interrupted by user.{Style.RESET_ALL}")
+                        
+                        print(f"\n{Fore.CYAN}Monitoring stopped. Returning to main menu...{Style.RESET_ALL}")
+                        input(f"{Fore.GREEN}Press ENTER to continue...{Style.RESET_ALL}")
+                        return True
                     else:
                         print(f"{Fore.RED}No wireless interfaces found!{Style.RESET_ALL}")
-                        return
+                        input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                        return True
                 except Exception as e:
                     print(f"{Fore.RED}Error detecting interfaces: {e}{Style.RESET_ALL}")
-                    return
-                break
+                    input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                    return True
+                    
             elif choice == '3':
                 # Custom command
-                print(f"\n{Fore.CYAN}Enter custom arguments for fake_ap_detector.sh{Style.RESET_ALL}")
+                print(f"\n{Fore.CYAN}Enter custom arguments for rogue_ap_detector.sh{Style.RESET_ALL}")
                 print(f"{Fore.WHITE}Examples:{Style.RESET_ALL}")
                 print(f"  --scan")
                 print(f"  --monitor wlan0")
@@ -543,18 +579,36 @@ def launch_script(script_path, script_type):
                 args = input(f"\n{Fore.YELLOW}Arguments: {Style.RESET_ALL}").strip()
                 if args:
                     print(f"\n{Fore.GREEN}Launching with custom arguments...{Style.RESET_ALL}\n")
-                    os.execvp("bash", ["bash", script_path] + args.split())
+                    try:
+                        subprocess.run(["bash", script_path] + args.split(), check=False)
+                    except KeyboardInterrupt:
+                        print(f"\n{Fore.YELLOW}Command interrupted by user.{Style.RESET_ALL}")
+                    
+                    print(f"\n{Fore.CYAN}Command finished. Returning to main menu...{Style.RESET_ALL}")
+                    input(f"{Fore.GREEN}Press ENTER to continue...{Style.RESET_ALL}")
+                    return True
                 else:
                     print(f"{Fore.RED}No arguments provided.{Style.RESET_ALL}")
-                    return
-                break
+                    continue
+                    
             elif choice == '4':
                 # Show help
-                print(f"\n{Fore.GREEN}Launching help menu...{Style.RESET_ALL}\n")
-                os.execvp("bash", ["bash", script_path, "--help"])
-                break
+                print(f"\n{Fore.GREEN}Displaying help menu...{Style.RESET_ALL}\n")
+                try:
+                    subprocess.run(["bash", script_path, "--help"], check=False)
+                except KeyboardInterrupt:
+                    print(f"\n{Fore.YELLOW}Help interrupted.{Style.RESET_ALL}")
+                
+                input(f"\n{Fore.GREEN}Press ENTER to continue...{Style.RESET_ALL}")
+                continue  # Stay in defender menu
+                
+            elif choice == '5':
+                # Back to main menu
+                print(f"\n{Fore.CYAN}Returning to main menu...{Style.RESET_ALL}")
+                return True
+                
             else:
-                print(f"{Fore.RED}Invalid option. Please select 1-4.{Style.RESET_ALL}")
+                print(f"{Fore.RED}Invalid option. Please select 1-5.{Style.RESET_ALL}")
 
 def main():
     """Main program flow"""
@@ -562,14 +616,14 @@ def main():
         # Check root privileges
         check_root()
         
-        # Show disclaimer and get acceptance
+        # Show disclaimer and get acceptance (only once at start)
         if not show_disclaimer():
             sys.exit(0)
         
-        # Show tool guide
+        # Show tool guide (only once at start)
         show_guide()
         
-        # Main loop
+        # Main loop - keep running until user chooses exit
         while True:
             # Show main menu and get choice
             choice = show_main_menu()
@@ -577,19 +631,19 @@ def main():
             # Handle setup option
             if choice == 'setup':
                 run_setup()
-                continue
+                continue  # Return to main menu after setup
             
             # Show authorization warning for offensive tools
             if not show_authorization_warning(choice):
-                continue
+                continue  # Return to menu if authorization denied
             
             # Copy and prepare the script
             script_path = copy_script(choice)
             
             if script_path:
-                # Launch the script
+                # Launch the script - it will return to menu when done
                 launch_script(script_path, choice)
-                break  # This line won't be reached due to exec, but included for clarity
+                # After script finishes, loop continues back to menu
             else:
                 print(f"\n{Fore.RED}Failed to prepare script.{Style.RESET_ALL}")
                 retry = input(f"{Fore.YELLOW}Return to main menu? (yes/no): {Style.RESET_ALL}").strip().lower()
