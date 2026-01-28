@@ -171,117 +171,115 @@ EOF
 
 show_help() {
   print_banner
-  cat <<EOF
-
-${BOLD}USAGE:${NC}
-  sudo $0 --monitor [INTERFACE]        Monitor for rogue APs in real-time
-  sudo $0 --scan [INTERFACE]           Scan for APs and check for rogues
-  sudo $0 --protect SSID BSSID         Protect specific AP (alert on clones)
-  sudo $0 --analyze LOGFILE            Analyze captured data for threats
-  sudo $0 --whitelist BSSID            Add trusted AP to whitelist
-  sudo $0 --blacklist BSSID            Add known rogue to blacklist
-  sudo $0 --baseline                   Create baseline of legitimate APs
-  sudo $0 --report                     Generate security report
-  sudo $0 --threats                    Show threat scoring dashboard
-  sudo $0 --clients                    Show tracked clients
-  sudo $0 --help                       Show this help
-
-${BOLD}DETECTION FEATURES:${NC}
-  ✓ Evil Twin Detection           Detect duplicate SSIDs with different BSSIDs
-  ✓ Rogue AP Detection            Identify unauthorized access points
-  ✓ Deauth Attack Detection       Alert on deauthentication floods
-  ✓ Signal Anomaly Detection      Detect suspiciously strong signals
-  ✓ Encryption Downgrade Alert    Warn when encryption weakens
-  ✓ Channel Switching Detection   Track suspicious channel changes
-  ✓ MAC Vendor Analysis           Identify suspicious manufacturers
-  ✓ Captive Portal Detection      Detect fake login portals
-  ✓ KARMA Attack Detection        Identify promiscuous APs
-  ✓ WPS Vulnerability Scan        Check for WPS exploits
-  ${CYAN}✓ DNS Spoofing Detection      Detect DNS manipulation${NC}
-  ${CYAN}✓ ARP Spoofing Detection      Detect ARP poisoning${NC}
-  ${CYAN}✓ SSL Strip Detection         Detect HTTPS downgrade attacks${NC}
-  ${CYAN}✓ MITM Indicator Analysis     Identify man-in-the-middle attacks${NC}
-  ${CYAN}✓ Probe Request Analysis      Track device probes and patterns${NC}
-  ${CYAN}✓ Client Fingerprinting       Identify device types and OS${NC}
-  ${CYAN}✓ Threat Scoring System       Rate APs by threat level${NC}
-  ${CYAN}✓ Deep Packet Inspection      Analyze traffic for anomalies${NC}
-
-${BOLD}MONITORING OPTIONS:${NC}
-  --interval SECONDS              Scan interval (default: 10)
-  --alert-email EMAIL             Send alerts via email
-  --alert-webhook URL             Send alerts to webhook
-  --alert-slack URL               Send alerts to Slack
-  --alert-telegram TOKEN CHAT_ID  Send alerts to Telegram
-  --sound-alert                   Play sound on detection
-  --no-notify                     Disable desktop notifications
-  --sensitivity [low|med|high]    Detection sensitivity level
-  --deep-inspection               Enable deep packet inspection
-  --capture-packets               Save packets for forensics
-  --auto-response                 Automatically counter detected threats
-
-${BOLD}ANALYSIS OPTIONS:${NC}
-  --check-encryption              Analyze encryption types
-  --check-vendors                 Verify MAC vendors
-  --check-signals                 Detect signal anomalies
-  --check-channels                Monitor channel usage
-  --detect-mitm                   Look for MITM indicators
-  --analyze-dns                   Monitor DNS queries for spoofing
-  --analyze-arp                   Monitor ARP for spoofing
-  --track-probes                  Analyze probe requests
-  --fingerprint-clients           Fingerprint connected devices
-
-${BOLD}EXAMPLES:${NC}
-  # Start basic monitoring
-  sudo $0 --monitor wlan0
-
-  # Advanced monitoring with all features
-  sudo $0 --monitor wlan0 --deep-inspection --capture-packets \\
-    --analyze-dns --analyze-arp --track-probes
-
-  # Protect your home WiFi with alerts
-  sudo $0 --protect "MyHomeWiFi" AA:BB:CC:DD:EE:FF \\
-    --alert-email admin@example.com --alert-slack https://hooks.slack.com/...
-
-  # Create baseline and continuous monitoring
-  sudo $0 --baseline
-  sudo $0 --monitor wlan0 --interval 5 --auto-response
-
-  # Generate comprehensive security report
-  sudo $0 --report
-
-  # View threat dashboard
-  sudo $0 --threats
-
-${BOLD}REQUIREMENTS:${NC}
-  - iw or iwconfig
-  - aircrack-ng suite (recommended for advanced features)
-  - tcpdump (for traffic analysis)
-  - tshark (for deep packet inspection)
-  - arpwatch (for ARP monitoring)
-  - notify-send (for desktop notifications)
-  - mail (for email alerts)
-  - jq (for JSON processing)
-  - curl (for webhooks)
-
-${BOLD}HOW IT PROTECTS YOU:${NC}
-  1. Continuously monitors wireless environment
-  2. Learns legitimate APs in your area (baseline)
-  3. Alerts when duplicate SSIDs appear (evil twins)
-  4. Detects deauthentication attacks in real-time
-  5. Identifies suspicious signal patterns
-  6. Warns about encryption downgrades
-  7. Detects MITM attacks (ARP/DNS spoofing, SSL stripping)
-  8. Analyzes probe requests for KARMA attacks
-  9. Fingerprints devices for anomaly detection
-  10. Scores threats and prioritizes alerts
-  11. Logs all suspicious activity with forensic detail
-  12. Optional auto-response to counter attacks
-
-${BOLD}LEGAL NOTICE:${NC}
-  This tool is for network defense and authorized security testing only.
-  Always obtain proper authorization before monitoring networks.
-
-EOF
+  echo ""
+  echo -e "${BOLD}USAGE:${NC}"
+  echo "  sudo $0 --monitor [INTERFACE]        Monitor for rogue APs in real-time"
+  echo "  sudo $0 --scan [INTERFACE]           Scan for APs and check for rogues"
+  echo "  sudo $0 --protect SSID BSSID         Protect specific AP (alert on clones)"
+  echo "  sudo $0 --analyze LOGFILE            Analyze captured data for threats"
+  echo "  sudo $0 --whitelist BSSID            Add trusted AP to whitelist"
+  echo "  sudo $0 --blacklist BSSID            Add known rogue to blacklist"
+  echo "  sudo $0 --baseline                   Create baseline of legitimate APs"
+  echo "  sudo $0 --report                     Generate security report"
+  echo "  sudo $0 --threats                    Show threat scoring dashboard"
+  echo "  sudo $0 --clients                    Show tracked clients"
+  echo "  sudo $0 --help                       Show this help"
+  echo ""
+  echo -e "${BOLD}DETECTION FEATURES:${NC}"
+  echo "  ✓ Evil Twin Detection           Detect duplicate SSIDs with different BSSIDs"
+  echo "  ✓ Rogue AP Detection            Identify unauthorized access points"
+  echo "  ✓ Deauth Attack Detection       Alert on deauthentication floods"
+  echo "  ✓ Signal Anomaly Detection      Detect suspiciously strong signals"
+  echo "  ✓ Encryption Downgrade Alert    Warn when encryption weakens"
+  echo "  ✓ Channel Switching Detection   Track suspicious channel changes"
+  echo "  ✓ MAC Vendor Analysis           Identify suspicious manufacturers"
+  echo "  ✓ Captive Portal Detection      Detect fake login portals"
+  echo "  ✓ KARMA Attack Detection        Identify promiscuous APs"
+  echo "  ✓ WPS Vulnerability Scan        Check for WPS exploits"
+  echo -e "  ${CYAN}✓ DNS Spoofing Detection      Detect DNS manipulation${NC}"
+  echo -e "  ${CYAN}✓ ARP Spoofing Detection      Detect ARP poisoning${NC}"
+  echo -e "  ${CYAN}✓ SSL Strip Detection         Detect HTTPS downgrade attacks${NC}"
+  echo -e "  ${CYAN}✓ MITM Indicator Analysis     Identify man-in-the-middle attacks${NC}"
+  echo -e "  ${CYAN}✓ Probe Request Analysis      Track device probes and patterns${NC}"
+  echo -e "  ${CYAN}✓ Client Fingerprinting       Identify device types and OS${NC}"
+  echo -e "  ${CYAN}✓ Threat Scoring System       Rate APs by threat level${NC}"
+  echo -e "  ${CYAN}✓ Deep Packet Inspection      Analyze traffic for anomalies${NC}"
+  echo ""
+  echo -e "${BOLD}MONITORING OPTIONS:${NC}"
+  echo "  --interval SECONDS              Scan interval (default: 10)"
+  echo "  --alert-email EMAIL             Send alerts via email"
+  echo "  --alert-webhook URL             Send alerts to webhook"
+  echo "  --alert-slack URL               Send alerts to Slack"
+  echo "  --alert-telegram TOKEN CHAT_ID  Send alerts to Telegram"
+  echo "  --sound-alert                   Play sound on detection"
+  echo "  --no-notify                     Disable desktop notifications"
+  echo "  --sensitivity [low|med|high]    Detection sensitivity level"
+  echo "  --deep-inspection               Enable deep packet inspection"
+  echo "  --capture-packets               Save packets for forensics"
+  echo "  --auto-response                 Automatically counter detected threats"
+  echo ""
+  echo -e "${BOLD}ANALYSIS OPTIONS:${NC}"
+  echo "  --check-encryption              Analyze encryption types"
+  echo "  --check-vendors                 Verify MAC vendors"
+  echo "  --check-signals                 Detect signal anomalies"
+  echo "  --check-channels                Monitor channel usage"
+  echo "  --detect-mitm                   Look for MITM indicators"
+  echo "  --analyze-dns                   Monitor DNS queries for spoofing"
+  echo "  --analyze-arp                   Monitor ARP for spoofing"
+  echo "  --track-probes                  Analyze probe requests"
+  echo "  --fingerprint-clients           Fingerprint connected devices"
+  echo ""
+  echo -e "${BOLD}EXAMPLES:${NC}"
+  echo "  # Start basic monitoring"
+  echo "  sudo $0 --monitor wlan0"
+  echo ""
+  echo "  # Advanced monitoring with all features"
+  echo "  sudo $0 --monitor wlan0 --deep-inspection --capture-packets \\"
+  echo "    --analyze-dns --analyze-arp --track-probes"
+  echo ""
+  echo "  # Protect your home WiFi with alerts"
+  echo "  sudo $0 --protect \"MyHomeWiFi\" AA:BB:CC:DD:EE:FF \\"
+  echo "    --alert-email admin@example.com --alert-slack https://hooks.slack.com/..."
+  echo ""
+  echo "  # Create baseline and continuous monitoring"
+  echo "  sudo $0 --baseline"
+  echo "  sudo $0 --monitor wlan0 --interval 5 --auto-response"
+  echo ""
+  echo "  # Generate comprehensive security report"
+  echo "  sudo $0 --report"
+  echo ""
+  echo "  # View threat dashboard"
+  echo "  sudo $0 --threats"
+  echo ""
+  echo -e "${BOLD}REQUIREMENTS:${NC}"
+  echo "  - iw or iwconfig"
+  echo "  - aircrack-ng suite (recommended for advanced features)"
+  echo "  - tcpdump (for traffic analysis)"
+  echo "  - tshark (for deep packet inspection)"
+  echo "  - arpwatch (for ARP monitoring)"
+  echo "  - notify-send (for desktop notifications)"
+  echo "  - mail (for email alerts)"
+  echo "  - jq (for JSON processing)"
+  echo "  - curl (for webhooks)"
+  echo ""
+  echo -e "${BOLD}HOW IT PROTECTS YOU:${NC}"
+  echo "  1. Continuously monitors wireless environment"
+  echo "  2. Learns legitimate APs in your area (baseline)"
+  echo "  3. Alerts when duplicate SSIDs appear (evil twins)"
+  echo "  4. Detects deauthentication attacks in real-time"
+  echo "  5. Identifies suspicious signal patterns"
+  echo "  6. Warns about encryption downgrades"
+  echo "  7. Detects MITM attacks (ARP/DNS spoofing, SSL stripping)"
+  echo "  8. Analyzes probe requests for KARMA attacks"
+  echo "  9. Fingerprints devices for anomaly detection"
+  echo "  10. Scores threats and prioritizes alerts"
+  echo "  11. Logs all suspicious activity with forensic detail"
+  echo "  12. Optional auto-response to counter attacks"
+  echo ""
+  echo -e "${BOLD}LEGAL NOTICE:${NC}"
+  echo "  This tool is for network defense and authorized security testing only."
+  echo "  Always obtain proper authorization before monitoring networks."
+  echo ""
   exit 0
 }
 
