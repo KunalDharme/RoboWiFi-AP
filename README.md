@@ -1,3 +1,5 @@
+![RoboWiFi-AP Banner](image.png)
+
 # RoboWiFi-AP - WiFi Security Assessment Framework
 
 Advanced wireless security toolkit with fake access point creation, password capture, monitoring, and rogue AP detection capabilities.
@@ -114,13 +116,13 @@ All basic features **PLUS:**
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/robowifi-ap.git
-cd robowifi-ap
+git clone https://github.com/KunalDharme/RoboWiFi-AP.git
+cd RoboWiFi-AP
 
 # Or download and extract
-wget https://github.com/yourusername/robowifi-ap/archive/main.zip
+wget https://github.com/KunalDharme/RoboWiFi-AP/archive/main.zip
 unzip main.zip
-cd robowifi-ap-main
+cd RoboWiFi-AP-main
 ```
 
 ### 2. Project Structure
