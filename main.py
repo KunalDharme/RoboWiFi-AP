@@ -476,22 +476,85 @@ def launch_script(script_path, script_type):
         print(f"{Fore.WHITE}TIP: Basic usage example:")
         print(f'{Fore.CYAN}  sudo {script_path} "TestAP" 6 eth0{Style.RESET_ALL}')
         print(f'{Fore.CYAN}  sudo {script_path} "TestAP" 6 eth0 --capture-auth{Style.RESET_ALL}')
+        print(f"{Fore.YELLOW}{'='*65}{Style.RESET_ALL}\n")
+        input(f"{Fore.GREEN}Press ENTER to launch the script...{Style.RESET_ALL}")
+        print()
+        os.execvp("bash", ["bash", script_path])
+        
     elif script_type == 'advanced':
         print(f"{Fore.WHITE}TIP: Advanced usage example:")
         print(f'{Fore.CYAN}  sudo {script_path} "TestAP" 6 eth0 --capture-auth --monitor{Style.RESET_ALL}')
         print(f'{Fore.CYAN}  sudo {script_path} "TestAP" 6 eth0 --captive-portal{Style.RESET_ALL}')
+        print(f"{Fore.YELLOW}{'='*65}{Style.RESET_ALL}\n")
+        input(f"{Fore.GREEN}Press ENTER to launch the script...{Style.RESET_ALL}")
+        print()
+        os.execvp("bash", ["bash", script_path])
+        
     elif script_type == 'defender':
-        print(f"{Fore.WHITE}TIP: Defender usage example:")
-        print(f'{Fore.CYAN}  sudo {script_path} --scan{Style.RESET_ALL}')
-        print(f'{Fore.CYAN}  sudo {script_path} --monitor wlan0{Style.RESET_ALL}')
-    
-    print(f"{Fore.YELLOW}{'='*65}{Style.RESET_ALL}\n")
-    
-    input(f"{Fore.GREEN}Press ENTER to launch the script...{Style.RESET_ALL}")
-    
-    # Execute the script
-    print()
-    os.execvp("bash", ["bash", script_path])
+        print(f"{Fore.WHITE}Defender Mode Options:{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}  [1]{Fore.WHITE} Quick Scan - Scan for rogue access points")
+        print(f"{Fore.CYAN}  [2]{Fore.WHITE} Monitor Mode - Continuous monitoring")
+        print(f"{Fore.CYAN}  [3]{Fore.WHITE} Custom Command - Enter your own arguments")
+        print(f"{Fore.CYAN}  [4]{Fore.WHITE} Help - Show all available options")
+        print(f"{Fore.YELLOW}{'='*65}{Style.RESET_ALL}\n")
+        
+        while True:
+            choice = input(f"{Fore.YELLOW}Select defender option [1-4]: {Style.RESET_ALL}").strip()
+            
+            if choice == '1':
+                # Quick scan
+                print(f"\n{Fore.GREEN}Starting quick scan for rogue APs...{Style.RESET_ALL}\n")
+                os.execvp("bash", ["bash", script_path, "--scan"])
+                break
+            elif choice == '2':
+                # Monitor mode
+                print(f"\n{Fore.CYAN}Available wireless interfaces:{Style.RESET_ALL}")
+                try:
+                    result = subprocess.run(['iw', 'dev'], capture_output=True, text=True)
+                    interfaces = []
+                    for line in result.stdout.split('\n'):
+                        if 'Interface' in line:
+                            iface = line.split()[-1]
+                            interfaces.append(iface)
+                            print(f"  • {iface}")
+                    
+                    if interfaces:
+                        iface = input(f"\n{Fore.YELLOW}Enter interface to monitor (default: {interfaces[0]}): {Style.RESET_ALL}").strip()
+                        if not iface:
+                            iface = interfaces[0]
+                        print(f"\n{Fore.GREEN}Starting continuous monitoring on {iface}...{Style.RESET_ALL}\n")
+                        os.execvp("bash", ["bash", script_path, "--monitor", iface])
+                    else:
+                        print(f"{Fore.RED}No wireless interfaces found!{Style.RESET_ALL}")
+                        return
+                except Exception as e:
+                    print(f"{Fore.RED}Error detecting interfaces: {e}{Style.RESET_ALL}")
+                    return
+                break
+            elif choice == '3':
+                # Custom command
+                print(f"\n{Fore.CYAN}Enter custom arguments for fake_ap_detector.sh{Style.RESET_ALL}")
+                print(f"{Fore.WHITE}Examples:{Style.RESET_ALL}")
+                print(f"  --scan")
+                print(f"  --monitor wlan0")
+                print(f"  --protect \"MyNetwork\" \"AA:BB:CC:DD:EE:FF\"")
+                print(f"  --analyze /path/to/logfile")
+                
+                args = input(f"\n{Fore.YELLOW}Arguments: {Style.RESET_ALL}").strip()
+                if args:
+                    print(f"\n{Fore.GREEN}Launching with custom arguments...{Style.RESET_ALL}\n")
+                    os.execvp("bash", ["bash", script_path] + args.split())
+                else:
+                    print(f"{Fore.RED}No arguments provided.{Style.RESET_ALL}")
+                    return
+                break
+            elif choice == '4':
+                # Show help
+                print(f"\n{Fore.GREEN}Launching help menu...{Style.RESET_ALL}\n")
+                os.execvp("bash", ["bash", script_path, "--help"])
+                break
+            else:
+                print(f"{Fore.RED}Invalid option. Please select 1-4.{Style.RESET_ALL}")
 
 def main():
     """Main program flow"""
