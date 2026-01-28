@@ -27,13 +27,13 @@ SCRIPT_DIR = Path(__file__).parent
 LOCAL_SCRIPTS = {
     "basic": SCRIPT_DIR / "scripts" / "fake_ap.sh",
     "advanced": SCRIPT_DIR / "scripts" / "advanced_fake_ap.sh",
-    "defender": SCRIPT_DIR / "scripts" / "rogue_ap_detector.sh"
+    "defender": SCRIPT_DIR / "scripts" / "fake_ap_detector.sh"
 }
 
 SCRIPT_NAMES = {
     "basic": "fake_ap.sh",
     "advanced": "advanced_fake_ap.sh",
-    "defender": "rogue_ap_detector.sh"
+    "defender": "fake_ap_detector.sh"
 }
 
 # Setup script path
@@ -569,7 +569,7 @@ def launch_script(script_path, script_type):
                     
             elif choice == '3':
                 # Custom command
-                print(f"\n{Fore.CYAN}Enter custom arguments for rogue_ap_detector.sh{Style.RESET_ALL}")
+                print(f"\n{Fore.CYAN}Enter custom arguments for fake_ap_detector.sh{Style.RESET_ALL}")
                 print(f"{Fore.WHITE}Examples:{Style.RESET_ALL}")
                 print(f"  --scan")
                 print(f"  --monitor wlan0")
