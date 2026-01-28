@@ -757,14 +757,6 @@ sudo ./setup.sh
 
 ---
 
-## 📝 License
-
-This tool is provided for **educational** and **authorized testing** purposes only.
-
-**Use responsibly and legally.**
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please ensure:
@@ -819,8 +811,13 @@ Include:
 **Remember: With great power comes great responsibility.**
 
 ---
+## 📜 License
+This project is licensed under the MIT License.
 
 **RoboWiFi-AP** - WiFi Security Assessment Framework  
 *For authorized security testing and education only.*
+
+## Author
+![Developed by Kunal Dharme](https://img.shields.io/badge/Developed%20by-Kunal%20Dharme-8e44ad?style=flat-square)
 
 🔐 Stay legal. Stay ethical. Stay secure.
