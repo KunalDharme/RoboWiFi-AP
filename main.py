@@ -7,6 +7,7 @@ A tool for authorized penetration testing and security research
 import os
 import sys
 import shutil
+import subprocess
 from pathlib import Path
 from colorama import Fore, Style, init
 from rich.console import Console
@@ -34,6 +35,10 @@ SCRIPT_NAMES = {
     "advanced": "advanced_fake_ap.sh",
     "defender": "fake_ap_detector.sh"
 }
+
+# Setup script path
+SETUP_SCRIPT = SCRIPT_DIR / "setup.sh"
+TEST_SCRIPT = SCRIPT_DIR / "test.sh"
 
 def clear():
     """Clear the terminal screen"""
@@ -132,7 +137,16 @@ def show_guide():
     print(f"{Fore.CYAN}                        TOOL GUIDE{Style.RESET_ALL}")
     print(f"{Fore.CYAN}{'='*65}{Style.RESET_ALL}\n")
     
-    guide_text = f"""{Fore.WHITE}RoboWiFi-AP provides three operational modes:
+    guide_text = f"""{Fore.WHITE}RoboWiFi-AP provides four operational modes:
+
+{Fore.YELLOW}0. SETUP & CHECK REQUIREMENTS{Style.RESET_ALL}
+{Fore.WHITE}   • Install all required dependencies
+   • Check system compatibility
+   • Verify wireless adapter capabilities
+   • Configure system settings
+   • Run diagnostic tests
+   
+   {Fore.YELLOW}Use Case:{Fore.WHITE} First-time setup, troubleshooting, system verification
 
 {Fore.GREEN}1. BASIC FAKE ACCESS POINT{Style.RESET_ALL}
 {Fore.WHITE}   • Create simple fake WiFi access points
@@ -170,6 +184,7 @@ def show_guide():
 
 {Fore.RED}⚠️  IMPORTANT NOTES:{Style.RESET_ALL}
 {Fore.WHITE}   • Requires root/sudo privileges
+   • Run setup (option 0) before first use
    • Wireless adapter must support AP mode (for offensive modes)
    • Some features require additional tools (hostapd-wpe, tcpdump)
    • Always ensure you have proper authorization
@@ -191,7 +206,10 @@ def show_main_menu():
         print(f"{Fore.CYAN}                       MAIN MENU{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'='*65}{Style.RESET_ALL}\n")
         
-        menu_text = f"""{Fore.GREEN}[1]{Fore.WHITE} Basic Fake Access Point
+        menu_text = f"""{Fore.YELLOW}[0]{Fore.WHITE} Setup & Check Requirements
+    {Fore.YELLOW}→{Fore.WHITE} Install dependencies and verify system readiness
+
+{Fore.GREEN}[1]{Fore.WHITE} Basic Fake Access Point
     {Fore.YELLOW}→{Fore.WHITE} Create simple fake AP with password capture
 
 {Fore.CYAN}[2]{Fore.WHITE} Advanced Fake Access Point
@@ -207,9 +225,11 @@ def show_main_menu():
         print(menu_text)
         print(f"{Fore.CYAN}{'='*65}{Style.RESET_ALL}\n")
         
-        choice = input(f"{Fore.YELLOW}Select an option [1-4]: {Style.RESET_ALL}").strip()
+        choice = input(f"{Fore.YELLOW}Select an option [0-4]: {Style.RESET_ALL}").strip()
         
-        if choice == '1':
+        if choice == '0':
+            return 'setup'
+        elif choice == '1':
             return 'basic'
         elif choice == '2':
             return 'advanced'
@@ -219,7 +239,7 @@ def show_main_menu():
             print(f"\n{Fore.CYAN}Exiting... Stay safe!{Style.RESET_ALL}\n")
             sys.exit(0)
         else:
-            print(f"\n{Fore.RED}Invalid option. Please select 1-4.{Style.RESET_ALL}")
+            print(f"\n{Fore.RED}Invalid option. Please select 0-4.{Style.RESET_ALL}")
             input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
 
 def check_root():
@@ -228,6 +248,163 @@ def check_root():
         print(f"\n{Fore.RED}ERROR: This tool requires root privileges.{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}Please run with: sudo python3 {sys.argv[0]}{Style.RESET_ALL}\n")
         sys.exit(1)
+
+def run_setup():
+    """Run the setup script to install dependencies"""
+    clear()
+    print_logo()
+    
+    print(f"\n{Fore.CYAN}{'='*65}{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}              SETUP & REQUIREMENTS CHECK{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{'='*65}{Style.RESET_ALL}\n")
+    
+    print(f"{Fore.WHITE}This will:{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}  • Install required packages (hostapd, dnsmasq, etc.)")
+    print(f"{Fore.CYAN}  • Check wireless adapter compatibility")
+    print(f"{Fore.CYAN}  • Configure system settings")
+    print(f"{Fore.CYAN}  • Optionally install hostapd-wpe for password capture")
+    print(f"{Fore.CYAN}  • Run system diagnostics\n")
+    
+    # Check if setup script exists
+    if not SETUP_SCRIPT.exists():
+        print(f"{Fore.RED}ERROR: Setup script not found at {SETUP_SCRIPT}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Please ensure setup.sh is in the same directory as this script.{Style.RESET_ALL}\n")
+        input(f"{Fore.CYAN}Press ENTER to return to menu...{Style.RESET_ALL}")
+        return False
+    
+    # Ask for confirmation
+    print(f"{Fore.YELLOW}Setup Options:{Style.RESET_ALL}")
+    print(f"{Fore.WHITE}[1] Full setup (install all dependencies)")
+    print(f"{Fore.WHITE}[2] Full setup + hostapd-wpe (for password capture)")
+    print(f"{Fore.WHITE}[3] Quick check only (verify system without installing)")
+    print(f"{Fore.WHITE}[4] Cancel and return to menu\n")
+    
+    while True:
+        setup_choice = input(f"{Fore.YELLOW}Select setup option [1-4]: {Style.RESET_ALL}").strip()
+        
+        if setup_choice == '1':
+            # Run full setup
+            print(f"\n{Fore.GREEN}Starting full setup...{Style.RESET_ALL}\n")
+            try:
+                result = subprocess.run(
+                    ["bash", str(SETUP_SCRIPT)],
+                    check=False
+                )
+                if result.returncode == 0:
+                    print(f"\n{Fore.GREEN}✓ Setup completed successfully!{Style.RESET_ALL}\n")
+                else:
+                    print(f"\n{Fore.YELLOW}⚠ Setup completed with warnings. Check output above.{Style.RESET_ALL}\n")
+            except Exception as e:
+                print(f"\n{Fore.RED}ERROR: Setup failed: {e}{Style.RESET_ALL}\n")
+            
+            input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+            return True
+            
+        elif setup_choice == '2':
+            # Run full setup with hostapd-wpe
+            print(f"\n{Fore.GREEN}Starting full setup with hostapd-wpe...{Style.RESET_ALL}\n")
+            try:
+                result = subprocess.run(
+                    ["bash", str(SETUP_SCRIPT), "--with-wpe"],
+                    check=False
+                )
+                if result.returncode == 0:
+                    print(f"\n{Fore.GREEN}✓ Setup completed successfully!{Style.RESET_ALL}\n")
+                else:
+                    print(f"\n{Fore.YELLOW}⚠ Setup completed with warnings. Check output above.{Style.RESET_ALL}\n")
+            except Exception as e:
+                print(f"\n{Fore.RED}ERROR: Setup failed: {e}{Style.RESET_ALL}\n")
+            
+            input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+            return True
+            
+        elif setup_choice == '3':
+            # Run quick check using test script
+            if TEST_SCRIPT.exists():
+                print(f"\n{Fore.GREEN}Running system diagnostics...{Style.RESET_ALL}\n")
+                try:
+                    result = subprocess.run(
+                        ["bash", str(TEST_SCRIPT), "--quick"],
+                        check=False
+                    )
+                    if result.returncode == 0:
+                        print(f"\n{Fore.GREEN}✓ System check passed!{Style.RESET_ALL}\n")
+                    else:
+                        print(f"\n{Fore.YELLOW}⚠ Some checks failed. See output above.{Style.RESET_ALL}\n")
+                except Exception as e:
+                    print(f"\n{Fore.RED}ERROR: System check failed: {e}{Style.RESET_ALL}\n")
+            else:
+                print(f"\n{Fore.YELLOW}Test script not found. Running basic checks...{Style.RESET_ALL}\n")
+                # Run basic checks
+                run_basic_checks()
+            
+            input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+            return True
+            
+        elif setup_choice == '4':
+            print(f"\n{Fore.CYAN}Setup cancelled. Returning to menu...{Style.RESET_ALL}\n")
+            return False
+            
+        else:
+            print(f"{Fore.RED}Invalid option. Please select 1-4.{Style.RESET_ALL}")
+
+def run_basic_checks():
+    """Run basic system checks without full setup"""
+    print(f"{Fore.CYAN}Running basic system checks...{Style.RESET_ALL}\n")
+    
+    # Check for required commands
+    required_commands = ['hostapd', 'dnsmasq', 'iptables', 'iw', 'ip']
+    all_present = True
+    
+    print(f"{Fore.WHITE}Checking required commands:{Style.RESET_ALL}")
+    for cmd in required_commands:
+        if shutil.which(cmd):
+            print(f"  {Fore.GREEN}✓{Style.RESET_ALL} {cmd}: {shutil.which(cmd)}")
+        else:
+            print(f"  {Fore.RED}✗{Style.RESET_ALL} {cmd}: NOT FOUND")
+            all_present = False
+    
+    # Check for optional commands
+    print(f"\n{Fore.WHITE}Checking optional commands:{Style.RESET_ALL}")
+    optional_commands = ['hostapd-wpe', 'tcpdump', 'aircrack-ng']
+    for cmd in optional_commands:
+        if shutil.which(cmd):
+            print(f"  {Fore.GREEN}✓{Style.RESET_ALL} {cmd}: {shutil.which(cmd)}")
+        else:
+            print(f"  {Fore.YELLOW}-{Style.RESET_ALL} {cmd}: not installed (optional)")
+    
+    # Check for wireless interfaces
+    print(f"\n{Fore.WHITE}Checking wireless interfaces:{Style.RESET_ALL}")
+    try:
+        result = subprocess.run(
+            ['iw', 'dev'],
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        if 'Interface' in result.stdout:
+            print(f"  {Fore.GREEN}✓{Style.RESET_ALL} Wireless interface(s) detected")
+            # Show interface names
+            for line in result.stdout.split('\n'):
+                if 'Interface' in line:
+                    iface = line.split()[-1]
+                    print(f"    • {iface}")
+        else:
+            print(f"  {Fore.RED}✗{Style.RESET_ALL} No wireless interfaces found")
+            all_present = False
+    except Exception as e:
+        print(f"  {Fore.RED}✗{Style.RESET_ALL} Error checking interfaces: {e}")
+        all_present = False
+    
+    # Summary
+    print(f"\n{Fore.CYAN}{'='*65}{Style.RESET_ALL}")
+    if all_present:
+        print(f"{Fore.GREEN}✓ All required components are present!{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}You can proceed to use the tools.{Style.RESET_ALL}")
+    else:
+        print(f"{Fore.RED}✗ Some required components are missing.{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Run full setup (option 1 or 2) to install them.{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{'='*65}{Style.RESET_ALL}\n")
 
 def copy_script(script_type):
     """Copy the selected script to user's directory"""
@@ -333,6 +510,11 @@ def main():
         while True:
             # Show main menu and get choice
             choice = show_main_menu()
+            
+            # Handle setup option
+            if choice == 'setup':
+                run_setup()
+                continue
             
             # Show authorization warning for offensive tools
             if not show_authorization_warning(choice):
