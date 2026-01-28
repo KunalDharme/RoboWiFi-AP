@@ -1,64 +1,47 @@
+#!/usr/bin/env python3
+"""
+RoboWiFi-AP - WiFi Security Assessment Framework
+A tool for authorized penetration testing and security research
+"""
+
 import os
 import sys
-import time
-import subprocess
-import requests
+import shutil
 from pathlib import Path
 from colorama import Fore, Style, init
 from rich.console import Console
 from rich.panel import Panel
-from rich.align import Align
 from rich.text import Text
+from rich.align import Align
+from time import sleep
 
-# Initialize
+# Initialize colorama
 init(autoreset=True)
-console = Console()
 
 # Configuration
 SCRIPTS_DIR = Path.home() / ".robowifi"
-SCRIPT_URLS = {
-    "red": "https://raw.githubusercontent.com/YOUR_REPO/fake_ap.sh",
-    "blue": "https://raw.githubusercontent.com/YOUR_REPO/rogue_ap_detector.sh"
+SCRIPT_DIR = Path(__file__).parent
+
+# Local script paths
+LOCAL_SCRIPTS = {
+    "basic": SCRIPT_DIR / "scripts" / "fake_ap.sh",
+    "advanced": SCRIPT_DIR / "scripts" / "advanced_fake_ap.sh",
+    "defender": SCRIPT_DIR / "scripts" / "fake_ap_detector.sh"
 }
+
 SCRIPT_NAMES = {
-    "red": "fake_ap.sh",
-    "blue": "rogue_ap_detector.sh"
+    "basic": "fake_ap.sh",
+    "advanced": "advanced_fake_ap.sh",
+    "defender": "fake_ap_detector.sh"
 }
 
 def clear():
+    """Clear the terminal screen"""
     os.system("clear" if os.name == "posix" else "cls")
 
-def matrix_type(text, delay=0.03, color=Fore.GREEN):
-    """Types text character by character like Matrix code"""
-    for char in text:
-        print(color + char, end="", flush=True)
-        time.sleep(delay)
-    print()
-
-def pause(duration=1.5):
-    """Dramatic pause"""
-    time.sleep(duration)
-
-def blink_cursor(duration=2):
-    """Blinking cursor effect"""
-    for _ in range(int(duration * 2)):
-        print("_", end="", flush=True)
-        time.sleep(0.3)
-        print("\b \b", end="", flush=True)
-        time.sleep(0.3)
-
-def chat_message(sender, text, typing_delay=0.04):
-    """Simulates incoming chat message"""
-    print(Fore.CYAN + f"[{sender}]: ", end="", flush=True)
-    pause(0.5)
-    for char in text:
-        print(Fore.WHITE + char, end="", flush=True)
-        time.sleep(typing_delay)
-    print()
-    pause(0.8)
-
-def banner():
+def print_logo():
     """Minimal banner - shown only once"""
+    console = Console()
     console.clear()
     
     title = Text("ROBO", style="bold red")
@@ -86,313 +69,294 @@ def banner():
     )
     
     console.print(panel)
-    pause(1)
+    sleep(1) 
 
-def download_pill_script(pill_type, script_name):
-    """Download the chosen pill script"""
+def show_disclaimer():
+    """Display legal disclaimer and get user acceptance"""
     clear()
-    pause(0.5)
+    print_logo()
     
-    if pill_type == "red":
-        chat_message("MORPHEUS", "Now, I'm going to show you what the Matrix really is.")
-        matrix_type(">>> Acquiring attack tools...", 0.02, Fore.RED)
-    else:
-        chat_message("MORPHEUS", "Let me show you the defenses.")
-        matrix_type(">>> Acquiring defense tools...", 0.02, Fore.BLUE)
+    print(f"\n{Fore.RED}{'='*65}{Style.RESET_ALL}")
+    print(f"{Fore.RED}                    ⚠️  LEGAL DISCLAIMER  ⚠️{Style.RESET_ALL}")
+    print(f"{Fore.RED}{'='*65}{Style.RESET_ALL}\n")
     
-    pause(0.5)
+    disclaimer_text = f"""{Fore.WHITE}This tool is designed for AUTHORIZED security testing and 
+educational purposes ONLY.
+
+{Fore.YELLOW}YOU MUST HAVE EXPLICIT WRITTEN PERMISSION before using this tool
+on any network you do not own.
+
+{Fore.WHITE}By using this software, you agree that:
+
+{Fore.CYAN}  1. {Fore.WHITE}You will ONLY use this tool on networks you own or have 
+     written authorization to test
+
+{Fore.CYAN}  2. {Fore.WHITE}You understand that unauthorized access to computer networks
+     is illegal in most jurisdictions
+
+{Fore.CYAN}  3. {Fore.WHITE}You are solely responsible for your actions and any 
+     consequences that result from using this tool
+
+{Fore.CYAN}  4. {Fore.WHITE}The authors and contributors assume NO LIABILITY for misuse
+     of this software
+
+{Fore.CYAN}  5. {Fore.WHITE}You will comply with all applicable laws and regulations
+
+{Fore.RED}UNAUTHORIZED USE OF THIS TOOL MAY RESULT IN CRIMINAL PROSECUTION.
+
+{Fore.WHITE}If you do not agree with these terms, exit now.{Style.RESET_ALL}
+"""
+    
+    print(disclaimer_text)
+    print(f"{Fore.RED}{'='*65}{Style.RESET_ALL}\n")
+    
+    while True:
+        response = input(f"{Fore.YELLOW}Do you accept these terms? (yes/no): {Style.RESET_ALL}").strip().lower()
+        
+        if response in ['yes', 'y']:
+            print(f"\n{Fore.GREEN}✓ Terms accepted. Proceeding...{Style.RESET_ALL}\n")
+            input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+            return True
+        elif response in ['no', 'n']:
+            print(f"\n{Fore.RED}Terms not accepted. Exiting...{Style.RESET_ALL}\n")
+            sys.exit(0)
+        else:
+            print(f"{Fore.RED}Invalid input. Please type 'yes' or 'no'.{Style.RESET_ALL}")
+
+def show_guide():
+    """Display tool guide and information"""
+    clear()
+    print_logo()
+    
+    print(f"\n{Fore.CYAN}{'='*65}{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}                        TOOL GUIDE{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{'='*65}{Style.RESET_ALL}\n")
+    
+    guide_text = f"""{Fore.WHITE}RoboWiFi-AP provides three operational modes:
+
+{Fore.GREEN}1. BASIC FAKE ACCESS POINT{Style.RESET_ALL}
+{Fore.WHITE}   • Create simple fake WiFi access points
+   • Capture WPA2 passwords (with hostapd-wpe)
+   • Internet sharing capabilities
+   • DHCP and DNS services
+   • Real-time client monitoring
+   
+   {Fore.YELLOW}Use Case:{Fore.WHITE} Basic penetration testing, credential harvesting,
+             testing client behavior
+
+{Fore.CYAN}2. ADVANCED FAKE ACCESS POINT{Style.RESET_ALL}
+{Fore.WHITE}   • All basic features PLUS:
+   • Captive portal for credential harvesting
+   • Packet monitoring with tcpdump
+   • MAC address filtering (whitelist/blacklist)
+   • Bandwidth limiting per client
+   • Hidden SSID (stealth mode)
+   • Comprehensive logging and analysis
+   
+   {Fore.YELLOW}Use Case:{Fore.WHITE} Advanced penetration testing, complex attack
+             scenarios, detailed traffic analysis
+
+{Fore.MAGENTA}3. ROGUE AP DETECTOR (DEFENDER){Style.RESET_ALL}
+{Fore.WHITE}   • Detect rogue/fake access points
+   • Monitor for evil twin attacks
+   • Identify deauthentication attacks
+   • ARP spoofing detection
+   • DNS spoofing detection
+   • Real-time threat alerts
+   • Client tracking and analysis
+   
+   {Fore.YELLOW}Use Case:{Fore.WHITE} Network defense, security monitoring, detecting
+             malicious access points
+
+{Fore.RED}⚠️  IMPORTANT NOTES:{Style.RESET_ALL}
+{Fore.WHITE}   • Requires root/sudo privileges
+   • Wireless adapter must support AP mode (for offensive modes)
+   • Some features require additional tools (hostapd-wpe, tcpdump)
+   • Always ensure you have proper authorization
+   • Keep logs secure and delete after use{Style.RESET_ALL}
+"""
+    
+    print(guide_text)
+    print(f"{Fore.CYAN}{'='*65}{Style.RESET_ALL}\n")
+    
+    input(f"{Fore.CYAN}Press ENTER to continue to main menu...{Style.RESET_ALL}")
+
+def show_main_menu():
+    """Display main menu and get user choice"""
+    while True:
+        clear()
+        print_logo()
+        
+        print(f"\n{Fore.CYAN}{'='*65}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}                       MAIN MENU{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'='*65}{Style.RESET_ALL}\n")
+        
+        menu_text = f"""{Fore.GREEN}[1]{Fore.WHITE} Basic Fake Access Point
+    {Fore.YELLOW}→{Fore.WHITE} Create simple fake AP with password capture
+
+{Fore.CYAN}[2]{Fore.WHITE} Advanced Fake Access Point
+    {Fore.YELLOW}→{Fore.WHITE} Full-featured AP with captive portal & monitoring
+
+{Fore.MAGENTA}[3]{Fore.WHITE} Rogue AP Detector (Defender Mode)
+    {Fore.YELLOW}→{Fore.WHITE} Detect and defend against fake access points
+
+{Fore.RED}[4]{Fore.WHITE} Exit
+    {Fore.YELLOW}→{Fore.WHITE} Exit the program
+"""
+        
+        print(menu_text)
+        print(f"{Fore.CYAN}{'='*65}{Style.RESET_ALL}\n")
+        
+        choice = input(f"{Fore.YELLOW}Select an option [1-4]: {Style.RESET_ALL}").strip()
+        
+        if choice == '1':
+            return 'basic'
+        elif choice == '2':
+            return 'advanced'
+        elif choice == '3':
+            return 'defender'
+        elif choice == '4':
+            print(f"\n{Fore.CYAN}Exiting... Stay safe!{Style.RESET_ALL}\n")
+            sys.exit(0)
+        else:
+            print(f"\n{Fore.RED}Invalid option. Please select 1-4.{Style.RESET_ALL}")
+            input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+
+def check_root():
+    """Check if script is running with root privileges"""
+    if os.geteuid() != 0:
+        print(f"\n{Fore.RED}ERROR: This tool requires root privileges.{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Please run with: sudo python3 {sys.argv[0]}{Style.RESET_ALL}\n")
+        sys.exit(1)
+
+def copy_script(script_type):
+    """Copy the selected script to user's directory"""
+    print(f"\n{Fore.CYAN}Preparing {SCRIPT_NAMES[script_type]}...{Style.RESET_ALL}")
     
     # Create directory if it doesn't exist
     SCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
     
-    # Download the script
     try:
-        url = SCRIPT_URLS[pill_type]
-        matrix_type(f">>> Connecting to secure server...", 0.02, Fore.CYAN)
-        pause(0.5)
+        source_script = LOCAL_SCRIPTS[script_type]
         
-        response = requests.get(url, timeout=30)
-        response.raise_for_status()
+        if not source_script.exists():
+            print(f"{Fore.RED}ERROR: Script not found at {source_script}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}Make sure all files are properly installed.{Style.RESET_ALL}")
+            return None
         
-        matrix_type(f">>> Downloading {script_name}...", 0.02, Fore.CYAN)
+        # Copy the script
+        dest_path = SCRIPTS_DIR / SCRIPT_NAMES[script_type]
+        shutil.copy2(source_script, dest_path)
+        dest_path.chmod(0o755)  # Make executable
         
-        # Simulate download progress
-        for i in range(0, 101, 20):
-            print(Fore.GREEN + f"\r>>> Progress: [{('█' * (i//5)).ljust(20)}] {i}%", end="", flush=True)
-            time.sleep(0.3)
-        print()
+        print(f"{Fore.GREEN}✓ Script ready: {dest_path}{Style.RESET_ALL}\n")
+        return str(dest_path)
         
-        script_path = SCRIPTS_DIR / script_name
-        script_path.write_text(response.text)
-        script_path.chmod(0o755)  # Make executable
-        
-        pause(0.5)
-        matrix_type(f">>> {script_name} acquired.", 0.02, Fore.GREEN)
-        pause(0.5)
-        
-        chat_message("MORPHEUS", "The tool is ready.")
-        pause(1)
-        return str(script_path)
-        
-    except requests.exceptions.RequestException as e:
-        matrix_type(f">>> ERROR: Download failed.", 0.02, Fore.RED)
-        print(Fore.YELLOW + f"    Connection issue: {str(e)}")
-        pause(1)
-        chat_message("MORPHEUS", "Something went wrong. Check your connection.")
-        pause(2)
+    except Exception as e:
+        print(f"{Fore.RED}ERROR: Failed to prepare script{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Details: {str(e)}{Style.RESET_ALL}")
         return None
 
-def matrix_intro():
-    """Matrix-style mysterious intro with chat"""
-    clear()
-    pause(1)
-    
-    # Simulated system boot
-    matrix_type(">>> Initializing secure channel...", 0.02, Fore.GREEN)
-    pause(0.5)
-    matrix_type(">>> Encryption handshake complete.", 0.02, Fore.GREEN)
-    pause(1)
-    print()
-    
-    # Mysterious chat begins
-    chat_message("UNKNOWN", "Wake up...")
-    blink_cursor(1)
-    
-    chat_message("UNKNOWN", "The Matrix has you.")
-    pause(1.5)
-    
-    chat_message("UNKNOWN", "Follow the white rabbit.")
-    pause(2)
-    
-    # Reveal identity slowly
-    print(Fore.CYAN + "[UNKNOWN" + Fore.GREEN + " → MORPHEUS" + Fore.CYAN + "]: ", end="", flush=True)
-    pause(1)
-    matrix_type("Knock, knock, Neo.", 0.05, Fore.WHITE)
-    pause(2)
-
-def get_user_name():
-    """Ask for name in Matrix style"""
-    clear()
-    pause(0.5)
-    
-    chat_message("MORPHEUS", "I've been looking for you.")
-    chat_message("MORPHEUS", "I know why you're here.")
-    pause(1)
-    
-    print(Fore.CYAN + "[MORPHEUS]: ", end="", flush=True)
-    pause(0.3)
-    matrix_type("What is your name?", 0.04, Fore.WHITE)
-    pause(0.5)
-    
-    name = input(Fore.YELLOW + Style.BRIGHT + "\n>>> ").strip()
-    
-    if not name:
-        name = "Neo"
-    
-    pause(1)
-    chat_message("MORPHEUS", f"Hello, {name}.")
-    pause(1.5)
-    
-    return name
-
-def disclaimer(name):
-    """Disclaimer framed as a warning from Morpheus"""
-    clear()
-    pause(0.5)
-    
-    chat_message("MORPHEUS", f"{name}, what you know you can't explain.")
-    chat_message("MORPHEUS", "But you feel it.")
-    pause(1)
-    
-    chat_message("MORPHEUS", "This tool reveals the truth about wireless networks.")
-    chat_message("MORPHEUS", "But it comes with responsibility.")
-    pause(1.5)
-    
-    print()
-    console.print("⚠️  DISCLAIMER:\n", style="bold red")
-    print(Fore.WHITE + "• This software is for EDUCATIONAL and AUTHORIZED use only.")
-    print(Fore.WHITE + "• Unauthorized network testing may be illegal.")
-    print(Fore.WHITE + "• You are solely responsible for how this tool is used.")
-    print(Fore.WHITE + "• The authors assume no liability.\n")
-    pause(1)
-    
-    accept = input(Fore.YELLOW + "Do you accept these terms? (yes/no) >>> ").strip().lower()
-    
-    if accept not in ["yes", "y"]:
-        print()
-        chat_message("MORPHEUS", "Perhaps you weren't ready.")
-        pause(1)
-        matrix_type(">>> Connection terminated.", 0.02, Fore.RED)
-        exit(0)
-    
-    pause(1)
-    chat_message("MORPHEUS", "Good.")
-
-def the_choice(name):
-    """The pill choice - the core moment"""
-    clear()
-    pause(1)
-    
-    chat_message("MORPHEUS", f"This is your last chance, {name}.")
-    pause(1.5)
-    
-    chat_message("MORPHEUS", "After this, there is no turning back.")
-    pause(2)
-    
-    print()
-    matrix_type("You take the BLUE PILL...", 0.05, Fore.BLUE)
-    pause(0.8)
-    matrix_type("    ...the story ends. You defend your network.", 0.04, Fore.BLUE)
-    pause(1.5)
-    
-    print()
-    matrix_type("You take the RED PILL...", 0.05, Fore.RED)
-    pause(0.8)
-    matrix_type("    ...and I show you how deep the rabbit hole goes.", 0.04, Fore.RED)
-    pause(2)
-    
-    print("\n")
-    chat_message("MORPHEUS", "Remember...")
-    pause(0.5)
-    chat_message("MORPHEUS", "All I'm offering is the truth. Nothing more.")
-    pause(2)
-    
-    print()
-    print(Fore.CYAN + "─" * 50)
-    print(Fore.RED + Style.BRIGHT + "  [R] " + Fore.WHITE + "RED PILL  " + Fore.RED + "→ Attack Simulation")
-    print(Fore.BLUE + Style.BRIGHT + "  [B] " + Fore.WHITE + "BLUE PILL " + Fore.BLUE + "→ Defense & Detection")
-    print(Fore.CYAN + "─" * 50)
-    print()
-    
-    while True:
-        choice = input(Fore.YELLOW + Style.BRIGHT + "Your choice >>> ").strip().lower()
+def show_authorization_warning(script_type):
+    """Show authorization warning for offensive tools"""
+    if script_type in ['basic', 'advanced']:
+        print(f"\n{Fore.RED}{'='*65}{Style.RESET_ALL}")
+        print(f"{Fore.RED}            ⚠️  AUTHORIZATION REQUIRED  ⚠️{Style.RESET_ALL}")
+        print(f"{Fore.RED}{'='*65}{Style.RESET_ALL}\n")
         
-        if choice in ['r', 'red']:
-            return 'red'
-        elif choice in ['b', 'blue']:
-            return 'blue'
-        else:
-            print(Fore.RED + "Invalid choice. Press R or B.")
-            pause(0.5)
+        print(f"{Fore.YELLOW}You are about to launch an OFFENSIVE security tool.{Style.RESET_ALL}\n")
+        print(f"{Fore.WHITE}Before proceeding, you MUST have:{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}  ✓ {Fore.WHITE}Written authorization from the network owner")
+        print(f"{Fore.CYAN}  ✓ {Fore.WHITE}Clearly defined scope of testing")
+        print(f"{Fore.CYAN}  ✓ {Fore.WHITE}Legal approval for password capture")
+        print(f"{Fore.CYAN}  ✓ {Fore.WHITE}Understanding of applicable laws\n")
+        
+        print(f"{Fore.RED}WITHOUT PROPER AUTHORIZATION, YOU MAY BE COMMITTING A CRIME.{Style.RESET_ALL}\n")
+        print(f"{Fore.RED}{'='*65}{Style.RESET_ALL}\n")
+        
+        while True:
+            confirm = input(f"{Fore.YELLOW}Type 'I HAVE AUTHORIZATION' to proceed: {Style.RESET_ALL}").strip()
+            
+            if confirm == "I HAVE AUTHORIZATION":
+                print(f"\n{Fore.GREEN}✓ Authorization confirmed. Proceeding...{Style.RESET_ALL}\n")
+                return True
+            else:
+                print(f"\n{Fore.RED}Authorization not confirmed.{Style.RESET_ALL}")
+                retry = input(f"{Fore.YELLOW}Return to main menu? (yes/no): {Style.RESET_ALL}").strip().lower()
+                if retry in ['yes', 'y']:
+                    return False
+                elif retry in ['no', 'n']:
+                    print(f"\n{Fore.CYAN}Exiting...{Style.RESET_ALL}\n")
+                    sys.exit(0)
+    return True
 
-def red_pill_authorization(name):
-    """Authorization check for red pill"""
-    clear()
-    pause(0.5)
+def launch_script(script_path, script_type):
+    """Launch the selected script"""
+    print(f"{Fore.CYAN}Launching {SCRIPT_NAMES[script_type]}...{Style.RESET_ALL}\n")
+    print(f"{Fore.YELLOW}{'='*65}{Style.RESET_ALL}")
     
-    matrix_type(">>> ACCESS LEVEL: RESTRICTED", 0.03, Fore.RED)
-    pause(1)
+    if script_type == 'basic':
+        print(f"{Fore.WHITE}TIP: Basic usage example:")
+        print(f'{Fore.CYAN}  sudo {script_path} "TestAP" 6 eth0{Style.RESET_ALL}')
+        print(f'{Fore.CYAN}  sudo {script_path} "TestAP" 6 eth0 --capture-auth{Style.RESET_ALL}')
+    elif script_type == 'advanced':
+        print(f"{Fore.WHITE}TIP: Advanced usage example:")
+        print(f'{Fore.CYAN}  sudo {script_path} "TestAP" 6 eth0 --capture-auth --monitor{Style.RESET_ALL}')
+        print(f'{Fore.CYAN}  sudo {script_path} "TestAP" 6 eth0 --captive-portal{Style.RESET_ALL}')
+    elif script_type == 'defender':
+        print(f"{Fore.WHITE}TIP: Defender usage example:")
+        print(f'{Fore.CYAN}  sudo {script_path} --scan{Style.RESET_ALL}')
+        print(f'{Fore.CYAN}  sudo {script_path} --monitor wlan0{Style.RESET_ALL}')
     
-    print()
-    chat_message("MORPHEUS", f"{name}, you chose to see how deep the rabbit hole goes.")
-    chat_message("MORPHEUS", "But this path requires authorization.")
-    pause(1.5)
+    print(f"{Fore.YELLOW}{'='*65}{Style.RESET_ALL}\n")
     
-    chat_message("MORPHEUS", "You must have EXPLICIT WRITTEN PERMISSION.")
-    chat_message("MORPHEUS", "Do you have authorization to test this network?")
-    pause(1)
-    
-    print()
-    consent = input(Fore.YELLOW + "Type 'I HAVE AUTHORIZATION' to proceed >>> ").strip().upper()
-    
-    if consent == "I HAVE AUTHORIZATION":
-        pause(1)
-        chat_message("MORPHEUS", "Very well.")
-        pause(0.5)
-        chat_message("MORPHEUS", "Follow me.")
-        return True
-    else:
-        pause(1)
-        chat_message("MORPHEUS", "You're not ready.")
-        pause(1.5)
-        return False
-
-def transfer_control(script_path, pill_type):
-    """Transfer control to the chosen script"""
-    clear()
-    pause(0.5)
-    
-    if pill_type == 'red':
-        matrix_type(">>> Entering the Matrix...", 0.03, Fore.RED)
-        pause(0.5)
-        matrix_type(">>> Attack simulation mode active.", 0.03, Fore.RED)
-    else:
-        matrix_type(">>> Initializing defense protocols...", 0.03, Fore.BLUE)
-        pause(0.5)
-        matrix_type(">>> Detection systems online.", 0.03, Fore.BLUE)
-    
-    pause(1)
-    matrix_type(">>> Transferring control...", 0.03, Fore.GREEN)
-    pause(1.5)
-    
-    print()
-    chat_message("MORPHEUS", "See you on the other side.")
-    pause(1)
+    input(f"{Fore.GREEN}Press ENTER to launch the script...{Style.RESET_ALL}")
     
     # Execute the script
+    print()
     os.execvp("bash", ["bash", script_path])
 
 def main():
-    # Boot sequence
-    banner()
-    
-    # Matrix intro with mysterious chat
-    matrix_intro()
-    
-    # Get user's name
-    name = get_user_name()
-    
-    # Show disclaimer
-    disclaimer(name)
-    
-    # The choice
-    while True:
-        choice = the_choice(name)
+    """Main program flow"""
+    try:
+        # Check root privileges
+        check_root()
         
-        if choice == 'red':
-            if red_pill_authorization(name):
-                # Download the red pill script
-                script_path = download_pill_script('red', SCRIPT_NAMES['red'])
-                if script_path:
-                    transfer_control(script_path, 'red')
-                    break
-                else:
-                    pause(2)
-                    clear()
-                    chat_message("MORPHEUS", "We'll try again.")
-                    pause(1)
-            else:
-                pause(2)
-                clear()
-                chat_message("MORPHEUS", "Let's try again.")
-                pause(1)
+        # Show disclaimer and get acceptance
+        if not show_disclaimer():
+            sys.exit(0)
         
-        elif choice == 'blue':
-            pause(1)
-            chat_message("MORPHEUS", "A wise choice.")
-            pause(1)
+        # Show tool guide
+        show_guide()
+        
+        # Main loop
+        while True:
+            # Show main menu and get choice
+            choice = show_main_menu()
             
-            # Download the blue pill script
-            script_path = download_pill_script('blue', SCRIPT_NAMES['blue'])
+            # Show authorization warning for offensive tools
+            if not show_authorization_warning(choice):
+                continue
+            
+            # Copy and prepare the script
+            script_path = copy_script(choice)
+            
             if script_path:
-                transfer_control(script_path, 'blue')
-                break
+                # Launch the script
+                launch_script(script_path, choice)
+                break  # This line won't be reached due to exec, but included for clarity
             else:
-                pause(2)
-                clear()
-                chat_message("MORPHEUS", "We'll try again.")
-                pause(1)
+                print(f"\n{Fore.RED}Failed to prepare script.{Style.RESET_ALL}")
+                retry = input(f"{Fore.YELLOW}Return to main menu? (yes/no): {Style.RESET_ALL}").strip().lower()
+                if retry not in ['yes', 'y']:
+                    sys.exit(1)
+    
+    except KeyboardInterrupt:
+        print(f"\n\n{Fore.YELLOW}Operation cancelled by user.{Style.RESET_ALL}\n")
+        sys.exit(0)
+    except Exception as e:
+        print(f"\n{Fore.RED}CRITICAL ERROR: {str(e)}{Style.RESET_ALL}\n")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\n")
-        matrix_type(">>> Connection interrupted.", 0.02, Fore.RED)
-        print()
-        exit(0)
-    except Exception as e:
-        print("\n")
-        matrix_type(f">>> SYSTEM ERROR: {str(e)}", 0.02, Fore.RED)
-        print()
-        exit(1)
+    main()

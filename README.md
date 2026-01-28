@@ -1,66 +1,81 @@
-# Fake Access Point Suite
+# RoboWiFi-AP - WiFi Security Assessment Framework
 
-Advanced wireless access point creation tool with password capture, monitoring, and captive portal capabilities.
+Advanced wireless security toolkit with fake access point creation, password capture, monitoring, and rogue AP detection capabilities.
 
 ## ⚠️ LEGAL WARNING
 
-**This tool is for authorized security testing and educational purposes ONLY.**
+**This tool is for AUTHORIZED security testing and educational purposes ONLY.**
 
-- Only use on networks you own or have explicit written permission to test
-- Unauthorized access point creation may be illegal in your jurisdiction
-- Password interception without consent is a criminal offense in most countries
-- Captive portal credential harvesting must only be used in authorized penetration tests
-- Check your local laws before use
+- ✅ Only use on networks you **own** or have **explicit written permission** to test
+- ❌ Unauthorized access point creation may be **illegal** in your jurisdiction
+- ❌ Password interception without consent is a **criminal offense** in most countries
+- ❌ Captive portal credential harvesting must only be used in **authorized penetration tests**
+- ⚖️ Check your **local laws** before use
 
-**The authors assume no liability for misuse of this software.**
+**The authors assume NO LIABILITY for misuse of this software.**
 
 ---
 
 ## 📋 Table of Contents
 
-- [Features](#features)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Usage](#usage)
-- [Advanced Features](#advanced-features)
-- [Troubleshooting](#troubleshooting)
-- [FAQ](#faq)
+- [Features](#-features)
+- [Requirements](#-requirements)
+- [Installation](#-installation)
+- [Quick Start](#-quick-start)
+- [Usage](#-usage)
+- [Advanced Features](#-advanced-features)
+- [Monitoring & Logs](#-monitoring-and-logs)
+- [Troubleshooting](#️-troubleshooting)
+- [FAQ](#-faq)
 
 ---
 
 ## ✨ Features
 
-### Core Features
-- ✅ Create fake wireless access points
+### 🎯 Three Operational Modes
+
+#### 1. Basic Fake Access Point (`fake_ap.sh`)
+- ✅ Create simple fake WiFi access points
 - ✅ WPA2 password capture (with hostapd-wpe)
 - ✅ Open network support
 - ✅ Internet sharing via uplink interface
 - ✅ DHCP server with configurable ranges
 - ✅ DNS forwarding
+- ✅ Real-time client monitoring
 
-### Advanced Features
+#### 2. Advanced Fake Access Point (`advanced_fake_ap.sh`)
+All basic features **PLUS:**
 - 🔐 **Captive portal** for credential harvesting
 - 📊 **Packet monitoring** with tcpdump
 - 🚫 **MAC address filtering** (whitelist/blacklist)
 - 📉 **Bandwidth limiting** per client
 - 👻 **Hidden SSID** (stealth mode)
 - 📱 **Multi-adapter support** with capability detection
-- 📈 **Real-time monitoring** and statistics
+- 📈 **Real-time statistics** and monitoring
 - 💾 **Comprehensive logging** of all activities
+
+#### 3. Rogue AP Detector (`fake_ap_detector.sh`)
+- 🔍 Detect fake/rogue access points
+- 🛡️ Monitor for evil twin attacks
+- 🚨 Identify deauthentication attacks
+- 🔐 ARP spoofing detection
+- 🌐 DNS spoofing detection
+- ⚡ Real-time threat alerts
+- 📊 Client tracking and analysis
 
 ---
 
 ## 🔧 Requirements
 
 ### Hardware
-- Wireless adapter with **AP mode** support
-- USB or built-in wireless card (check compatibility)
+- **Wireless adapter** with AP mode support
+- USB or built-in wireless card (check compatibility below)
 
 ### Software
-- Debian/Ubuntu-based Linux distribution (Kali, Parrot, etc.)
-- Root/sudo access
-- Kernel 4.0+ recommended
+- **Linux**: Debian/Ubuntu-based distribution (Kali, Parrot, Ubuntu, etc.)
+- **Privileges**: Root/sudo access
+- **Kernel**: 4.0+ recommended
+- **Python**: 3.6+ (for main interface)
 
 ### Required Packages
 - `hostapd` - Access point daemon
@@ -68,32 +83,82 @@ Advanced wireless access point creation tool with password capture, monitoring, 
 - `iptables` - Firewall and NAT
 - `iw` - Wireless configuration
 - `iproute2` - Network configuration
+- `python3` - Main interface
+- `colorama` - Terminal colors (Python)
+- `rich` - Terminal UI (Python)
 
 ### Optional Packages
-- `hostapd-wpe` - For password capture
+- `hostapd-wpe` - For WPA2 password capture
 - `tcpdump` - For packet monitoring
-- `python3` - For captive portal
 - `aircrack-ng` - For advanced monitoring
 - `ethtool` - For adapter information
+
+### Recommended Wireless Adapters
+**Excellent Compatibility:**
+- Atheros chipsets (ath9k, ath10k)
+- Intel chipsets (iwlwifi)
+- MediaTek chipsets (mt76xx)
+
+**Good Compatibility:**
+- Ralink chipsets (rt2800)
+
+**Limited/Poor:**
+- Realtek chipsets (rtl8xxx) - often limited AP support
+- Broadcom (limited support)
 
 ---
 
 ## 📦 Installation
 
-### 1. Clone or Download
+### 1. Download the Project
 
 ```bash
-# Download the scripts
-wget https://example.com/fake_ap.sh
-wget https://example.com/setup.sh
-wget https://example.com/test.sh
+# Clone repository
+git clone https://github.com/yourusername/robowifi-ap.git
+cd robowifi-ap
 
-# Make executable
-chmod +x fake_ap.sh setup.sh test.sh
+# Or download and extract
+wget https://github.com/yourusername/robowifi-ap/archive/main.zip
+unzip main.zip
+cd robowifi-ap-main
 ```
 
-### 2. Run Setup Script
+### 2. Project Structure
 
+Ensure your project has this structure:
+
+```
+robowifi-ap/
+├── main.py                    # Main interface
+├── setup.sh                   # Setup script
+├── requirements.txt           # Python dependencies
+├── README.md                  # This file
+└── scripts/
+    ├── fake_ap.sh            # Basic AP script
+    ├── advanced_fake_ap.sh   # Advanced AP script
+    └── fake_ap_detector.sh  # Defender script
+```
+
+### 3. Install Python Dependencies
+
+```bash
+# Install Python packages
+pip3 install -r requirements.txt
+
+# Or manually
+pip3 install colorama rich
+```
+
+### 4. Run Setup (Two Options)
+
+#### Option A: Through Main Interface (Recommended)
+```bash
+sudo python3 main.py
+# Select option [0] Setup & Check Requirements
+# Choose setup type (1, 2, or 3)
+```
+
+#### Option B: Direct Setup Script
 ```bash
 # Basic installation
 sudo ./setup.sh
@@ -102,83 +167,132 @@ sudo ./setup.sh
 sudo ./setup.sh --with-wpe
 ```
 
-### 3. Test Your System
+### 5. Verify Installation
 
 ```bash
-# Quick compatibility check
-sudo ./test.sh --quick
+# Through main interface
+sudo python3 main.py
+# Select option [0] → option [3] Quick check
 
-# Full system test
-sudo ./test.sh --full
-
-# Test specific adapter
-sudo ./test.sh --adapter wlan0
+# Or directly
+sudo python3 main.py
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### Check Available Adapters
+### Using Main Interface (Recommended)
 
 ```bash
-sudo ./fake_ap.sh list-adapters
+# Launch main interface
+sudo python3 main.py
+
+# Follow the menu:
+# 1. Accept disclaimer
+# 2. Read tool guide
+# 3. Choose your mode:
+#    [0] Setup & Check Requirements
+#    [1] Basic Fake Access Point
+#    [2] Advanced Fake Access Point
+#    [3] Rogue AP Detector
+#    [4] Exit
 ```
 
-### Create Basic Open Network
+### Direct Script Usage
 
+#### Check Available Adapters
 ```bash
-sudo ./fake_ap.sh "FreeWiFi" 6 eth0
+sudo ./scripts/fake_ap.sh list-adapters
 ```
 
-### Create Network with Password Capture
-
+#### Create Basic Open Network
 ```bash
-sudo ./fake_ap.sh "CoffeeShop" 6 eth0 wlan0 --capture-auth
+sudo ./scripts/fake_ap.sh "FreeWiFi" 6 eth0
 ```
 
-### Create Hidden Network with Captive Portal
-
+#### Create Network with Password Capture
 ```bash
-sudo ./fake_ap.sh "SecureNet" 11 eth0 --hide-ssid --captive-portal
+sudo ./scripts/fake_ap.sh "CoffeeShop" 6 eth0 wlan0 --capture-auth
 ```
 
-### Stop the Access Point
-
+#### Create Hidden Network with Captive Portal
 ```bash
-sudo ./fake_ap.sh stop eth0
+sudo ./scripts/advanced_fake_ap.sh "SecureNet" 11 eth0 --hide-ssid --captive-portal
 ```
 
-### Check Status
-
+#### Run Rogue AP Detector
 ```bash
-sudo ./fake_ap.sh status
+sudo ./scripts/fake_ap_detector.sh --scan
+sudo ./scripts/fake_ap_detector.sh --monitor wlan0
+```
+
+#### Stop Access Point
+```bash
+sudo ./scripts/fake_ap.sh stop eth0
+```
+
+#### Check Status
+```bash
+sudo ./scripts/fake_ap.sh status
 ```
 
 ---
 
 ## 📖 Usage
 
-### Basic Syntax
+### Main Interface Options
 
-```bash
-sudo ./fake_ap.sh SSID CHANNEL UPLINK_IF [WLAN_IF] [OPTIONS]
+```
+[0] Setup & Check Requirements
+    → Install dependencies, verify system, check adapters
+
+[1] Basic Fake Access Point
+    → Simple AP with password capture capability
+
+[2] Advanced Fake Access Point
+    → Full-featured AP with captive portal, monitoring, filtering
+
+[3] Rogue AP Detector (Defender Mode)
+    → Detect and defend against fake access points
+
+[4] Exit
 ```
 
-### Parameters
+### Basic Fake AP - Command Line
 
+**Syntax:**
+```bash
+sudo ./scripts/fake_ap.sh SSID CHANNEL UPLINK_IF [WLAN_IF] [OPTIONS]
+```
+
+**Parameters:**
 | Parameter | Description | Example |
 |-----------|-------------|---------|
-| `SSID` | Network name | `"FreeWiFi"` |
+| `SSID` | Network name (max 32 chars) | `"FreeWiFi"` |
 | `CHANNEL` | WiFi channel (1-14) | `6` or `11` |
-| `UPLINK_IF` | Internet interface or `none` | `eth0`, `enp1s0` |
-| `WLAN_IF` | Wireless interface (optional) | `wlan0` |
+| `UPLINK_IF` | Internet interface or `none` | `eth0`, `enp1s0`, `none` |
+| `WLAN_IF` | Wireless interface (auto-detect if omitted) | `wlan0` |
 
-### Options
-
+**Options:**
 | Option | Description |
 |--------|-------------|
-| `--capture-auth` | Enable WPA2 password capture |
+| `--capture-auth` | Enable WPA2 password capture (requires hostapd-wpe) |
+| `list-adapters` | Show all wireless adapters and capabilities |
+| `status` | Show current AP status and statistics |
+| `stop [UPLINK_IF]` | Stop the access point |
+| `--help` | Display help message |
+
+### Advanced Fake AP - Command Line
+
+**Syntax:**
+```bash
+sudo ./scripts/advanced_fake_ap.sh SSID CHANNEL UPLINK_IF [WLAN_IF] [OPTIONS]
+```
+
+**Additional Options:**
+| Option | Description |
+|--------|-------------|
 | `--monitor` | Enable packet monitoring with tcpdump |
 | `--mac-filter` | Enable MAC address filtering |
 | `--bandwidth-limit N` | Limit bandwidth to N KB/s per client |
@@ -186,25 +300,37 @@ sudo ./fake_ap.sh SSID CHANNEL UPLINK_IF [WLAN_IF] [OPTIONS]
 | `--hide-ssid` | Hide SSID broadcast (stealth mode) |
 | `--adapter-check` | Check adapter capabilities |
 
-### Commands
+### Rogue AP Detector - Command Line
 
-| Command | Description |
-|---------|-------------|
-| `list-adapters` | Show all wireless adapters and capabilities |
-| `status` | Show current AP status and statistics |
-| `stop [UPLINK_IF]` | Stop the access point |
+**Syntax:**
+```bash
+sudo ./scripts/fake_ap_detector.sh [OPTIONS]
+```
+
+**Options:**
+| Option | Description |
+|--------|-------------|
+| `--scan` | Quick scan for rogue APs |
+| `--monitor [INTERFACE]` | Continuous monitoring mode |
+| `--protect SSID BSSID` | Protect specific network |
+| `--analyze LOGFILE` | Analyze captured logs |
 | `--help` | Display help message |
 
 ---
 
 ## 🎯 Advanced Features
 
-### 1. Password Capture
+### 1. WPA2 Password Capture
 
-Captures WPA2 passwords from connecting clients:
+Captures passwords from connecting clients (requires `hostapd-wpe`):
 
 ```bash
-sudo ./fake_ap.sh "TestAP" 6 eth0 --capture-auth
+# Through main interface
+sudo python3 main.py
+# Select [1] or [2], then confirm authorization
+
+# Direct usage
+sudo ./scripts/fake_ap.sh "TestAP" 6 eth0 --capture-auth
 ```
 
 **View captured passwords:**
@@ -217,36 +343,36 @@ cat /tmp/fakeap_auth_attempts.log
 Creates a fake login page to harvest credentials:
 
 ```bash
-sudo ./fake_ap.sh "Free WiFi" 6 eth0 --captive-portal
+sudo ./scripts/advanced_fake_ap.sh "Free WiFi" 6 eth0 --captive-portal
 ```
 
-**View portal captures:**
+**Access portal:** Open browser and navigate to `http://192.168.1.1`
+
+**View captured credentials:**
 ```bash
 cat /tmp/fakeap_portal_credentials.log
 ```
-
-Portal URL: `http://192.168.1.1`
 
 ### 3. Packet Monitoring
 
 Captures all wireless traffic:
 
 ```bash
-sudo ./fake_ap.sh "MonitorAP" 6 eth0 --monitor
+sudo ./scripts/advanced_fake_ap.sh "MonitorAP" 6 eth0 --monitor
 ```
 
-**View captures:**
+**View packet captures:**
 ```bash
 ls -lh /tmp/fakeap_pcaps/
 wireshark /tmp/fakeap_pcaps/capture_*.pcap
 ```
 
-### 4. MAC Filtering
+### 4. MAC Address Filtering
 
 Control which devices can connect:
 
 ```bash
-sudo ./fake_ap.sh "FilteredAP" 6 eth0 --mac-filter
+sudo ./scripts/advanced_fake_ap.sh "FilteredAP" 6 eth0 --mac-filter
 ```
 
 **Add to whitelist:**
@@ -261,10 +387,10 @@ echo "11:22:33:44:55:66" >> /tmp/fakeap_mac_blacklist.txt
 
 ### 5. Bandwidth Limiting
 
-Limit speed per client:
+Limit speed per client (in KB/s):
 
 ```bash
-sudo ./fake_ap.sh "SlowWiFi" 6 eth0 --bandwidth-limit 512
+sudo ./scripts/advanced_fake_ap.sh "SlowWiFi" 6 eth0 --bandwidth-limit 512
 ```
 
 ### 6. Hidden SSID
@@ -272,27 +398,43 @@ sudo ./fake_ap.sh "SlowWiFi" 6 eth0 --bandwidth-limit 512
 Create stealth access point:
 
 ```bash
-sudo ./fake_ap.sh "HiddenNet" 6 eth0 --hide-ssid
+sudo ./scripts/advanced_fake_ap.sh "HiddenNet" 6 eth0 --hide-ssid
 ```
 
-### 7. Combined Features
+### 7. Combined Advanced Features
 
 Use multiple features together:
 
 ```bash
-sudo ./fake_ap.sh "AdvancedAP" 6 eth0 wlan0 \
+sudo ./scripts/advanced_fake_ap.sh "SecureAP" 6 eth0 wlan0 \
   --capture-auth \
   --monitor \
   --captive-portal \
   --bandwidth-limit 1024 \
-  --hide-ssid
+  --hide-ssid \
+  --mac-filter
+```
+
+### 8. Rogue AP Detection
+
+Protect your network from fake APs:
+
+```bash
+# Quick scan
+sudo ./scripts/fake_ap_detector.sh --scan
+
+# Continuous monitoring
+sudo ./scripts/fake_ap_detector.sh --monitor wlan0
+
+# Protect specific network
+sudo ./scripts/fake_ap_detector.sh --protect "MyNetwork" "AA:BB:CC:DD:EE:FF"
 ```
 
 ---
 
 ## 🔍 Monitoring and Logs
 
-### Log Locations
+### Log File Locations
 
 | File | Description |
 |------|-------------|
@@ -301,7 +443,8 @@ sudo ./fake_ap.sh "AdvancedAP" 6 eth0 wlan0 \
 | `/tmp/fakeap_monitor.log` | Packet monitoring statistics |
 | `/tmp/hostapd_fakeap.log` | hostapd daemon log |
 | `/tmp/dnsmasq_fakeap.log` | DHCP/DNS server log |
-| `/tmp/fakeap_pcaps/` | Packet capture files |
+| `/tmp/fakeap_pcaps/` | Packet capture files (pcap format) |
+| `/tmp/robowifi_setup_*.log` | Setup script logs |
 
 ### Real-time Monitoring
 
@@ -312,24 +455,43 @@ tail -f /tmp/hostapd_fakeap.log
 # Watch authentication attempts
 tail -f /tmp/fakeap_auth_attempts.log
 
-# Watch portal captures
+# Watch captive portal captures
 tail -f /tmp/fakeap_portal_credentials.log
 
 # Check connected clients
 cat /var/lib/misc/dnsmasq.leases
 ```
 
-### Statistics
+### Status and Statistics
 
 ```bash
 # Full status report
-sudo ./fake_ap.sh status
+sudo ./scripts/fake_ap.sh status
 
-# Connected clients
+# Connected clients with ARP
 arp -n | grep 192.168.1
 
 # Traffic statistics
 iptables -L -n -v
+
+# Wireless interface info
+iw dev wlan0 info
+```
+
+### Log Security
+
+**⚠️ IMPORTANT:** Logs contain sensitive information!
+
+```bash
+# Secure log permissions (run after testing)
+sudo chmod 600 /tmp/fakeap_*.log
+
+# Delete logs after testing
+sudo rm -f /tmp/fakeap_*.log
+sudo rm -rf /tmp/fakeap_pcaps/
+
+# Or use secure deletion
+sudo shred -vfz -n 3 /tmp/fakeap_*.log
 ```
 
 ---
@@ -347,18 +509,22 @@ ip link show
 iw dev
 
 # List compatible adapters
-sudo ./fake_ap.sh list-adapters
+sudo ./scripts/fake_ap.sh list-adapters
 
-# Test specific adapter
-sudo ./test.sh --adapter wlan0
+# Check through main interface
+sudo python3 main.py
+# Select [0] → [3] Quick check
 ```
 
 #### 2. "Adapter does not support AP mode"
 
+**Problem:** Your wireless card doesn't support AP mode
+
 **Solution:**
-- Your wireless card doesn't support AP mode
-- Try a different adapter (recommended: Atheros, Intel, MediaTek)
-- Check compatibility: https://wireless.wiki.kernel.org
+- Try a different USB port
+- Check adapter compatibility: https://wireless.wiki.kernel.org
+- Use recommended chipsets: Atheros, Intel, MediaTek
+- Avoid Realtek chipsets (limited support)
 
 #### 3. "hostapd process died unexpectedly"
 
@@ -367,10 +533,12 @@ sudo ./test.sh --adapter wlan0
 # Check hostapd log
 cat /tmp/hostapd_fakeap.log
 
-# Common fixes:
-# - Stop NetworkManager: sudo systemctl stop NetworkManager
-# - Kill wpa_supplicant: sudo pkill wpa_supplicant
-# - Check driver: ethtool -i wlan0
+# Stop conflicting services
+sudo systemctl stop NetworkManager
+sudo pkill wpa_supplicant
+
+# Check driver
+ethtool -i wlan0
 ```
 
 #### 4. "hostapd-wpe not found"
@@ -380,9 +548,13 @@ cat /tmp/hostapd_fakeap.log
 # Install from repositories (Kali/Parrot)
 sudo apt-get install hostapd-wpe
 
+# Or through main interface
+sudo python3 main.py
+# Select [0] → [2] (Full setup + hostapd-wpe)
+
 # Or build from source
 git clone https://github.com/OpenSecurityResearch/hostapd-wpe
-cd hostapd-wpe
+cd hostapd-wpe/hostapd-wpe
 make
 sudo make install
 ```
@@ -401,44 +573,70 @@ sudo systemctl stop systemd-resolved
 cat /tmp/dnsmasq_fakeap.log
 ```
 
-#### 6. Clients can't get DHCP lease
+#### 6. "Permission denied" errors
+
+**Solution:**
+```bash
+# Always run with sudo
+sudo python3 main.py
+
+# Or for direct scripts
+sudo ./scripts/fake_ap.sh ...
+```
+
+#### 7. Clients can't connect / No DHCP lease
 
 **Solution:**
 ```bash
 # Check DHCP log
 cat /tmp/dnsmasq_fakeap.log
 
-# Verify interface configuration
+# Verify interface is up
 ip addr show wlan0
 
 # Check iptables rules
 iptables -L -n -v
+
+# Verify IP forwarding (if using uplink)
+cat /proc/sys/net/ipv4/ip_forward
+# Should show: 1
 ```
 
-### Run Diagnostics
+#### 8. "Module not found" (Python errors)
 
+**Solution:**
 ```bash
-# Quick system check
-sudo ./test.sh --quick
+# Install Python dependencies
+pip3 install -r requirements.txt
 
-# Full diagnostic test
-sudo ./test.sh --full
-
-# Attempt auto-fix
-sudo ./test.sh --full --fix
+# Or manually
+pip3 install colorama rich
 ```
 
-### Reset Everything
+### Run System Diagnostics
 
 ```bash
-# Stop fake AP
-sudo ./fake_ap.sh stop
+# Through main interface (recommended)
+sudo python3 main.py
+# Select [0] → [3] Quick check
 
-# Restart network services
+# Or run test script directly (if available)
+sudo ./test.sh --quick    # Quick check
+sudo ./test.sh --full     # Full diagnostic
+```
+
+### Complete Reset
+
+```bash
+# 1. Stop all services
+sudo ./scripts/fake_ap.sh stop
+sudo ./scripts/advanced_fake_ap.sh stop
+
+# 2. Restart network services
 sudo systemctl restart NetworkManager
 sudo systemctl restart wpa_supplicant
 
-# Reboot if needed
+# 3. Reboot if issues persist
 sudo reboot
 ```
 
@@ -448,54 +646,88 @@ sudo reboot
 
 ### Q: Is this legal?
 
-**A:** Only on networks you own or have written permission to test. Unauthorized use is illegal.
+**A:** **Only** on networks you **own** or have **written permission** to test. Unauthorized use is **illegal** and may result in criminal charges.
 
 ### Q: Which wireless adapters work best?
 
-**A:** Recommended chipsets:
-- **Excellent:** Atheros (ath9k), Intel (iwlwifi), MediaTek (mt76xx)
-- **Good:** Ralink (rt2800), Broadcom (limited)
-- **Poor:** Realtek (rtl8xxx) - often limited AP support
+**A:** 
+- **Best:** Atheros (ath9k), Intel (iwlwifi), MediaTek (mt76xx)
+- **Good:** Ralink (rt2800)
+- **Avoid:** Realtek (rtl8xxx) - limited AP mode support
+
+Check compatibility: https://wikidevi.wi-cat.ru/
 
 ### Q: Can I capture WPA2 handshakes?
 
-**A:** Yes, with `--capture-auth` and `--monitor` options. Use aircrack-ng to crack captures.
+**A:** Yes, with `--capture-auth` and `--monitor` options. Use `aircrack-ng` or `hashcat` to crack captures.
 
-### Q: Does this work in a VM?
+### Q: Does this work in a virtual machine?
 
-**A:** Limited support. USB passthrough works better than built-in VM networking.
+**A:** Limited support. USB passthrough works best. Built-in VM wireless adapters often don't support AP mode.
 
-### Q: How do I crack captured hashes?
+### Q: How do I crack captured password hashes?
 
-**A:** Use hashcat or aircrack-ng:
+**A:** 
 ```bash
-# Extract hash from log
-grep "Hash:" /tmp/fakeap_auth_attempts.log
+# View captured data
+cat /tmp/fakeap_auth_attempts.log
+
+# Extract hash (if available)
+grep "Hash:" /tmp/fakeap_auth_attempts.log > hash.txt
 
 # Crack with hashcat
 hashcat -m 5500 hash.txt wordlist.txt
+
+# Or with aircrack-ng
+aircrack-ng -w wordlist.txt capture.cap
 ```
 
 ### Q: Can clients detect this is a fake AP?
 
-**A:** Possibly. Hidden SSIDs, captive portals, and weak signals may raise suspicion. Use realistic network names.
+**A:** Possibly. Indicators include:
+- Hidden SSID on known network
+- Captive portal on familiar network
+- Weak signal strength
+- Different BSSID (MAC) than expected
+- Certificate warnings (for HTTPS sites)
 
-### Q: How do I make it persistent after reboot?
+Use realistic configurations to avoid detection.
 
-**A:** Create a systemd service or add to `/etc/rc.local` (not recommended for security).
+### Q: How do I make the AP persistent after reboot?
 
-### Q: Why is my internet sharing not working?
+**A:** Not recommended for security reasons. If needed:
+```bash
+# Create systemd service (advanced users only)
+sudo nano /etc/systemd/system/robowifi.service
+```
+
+### Q: Why isn't internet sharing working?
 
 **A:** Check:
 ```bash
-# Verify IP forwarding
-cat /proc/sys/net/ipv4/ip_forward
+# 1. IP forwarding enabled
+cat /proc/sys/net/ipv4/ip_forward  # Should be 1
 
-# Check NAT rules
+# 2. NAT rules present
 iptables -t nat -L -n -v
 
-# Verify uplink interface
-ip addr show eth0
+# 3. Uplink interface has internet
+ping -I eth0 8.8.8.8
+
+# 4. DNS is working
+nslookup google.com
+```
+
+### Q: How do I update RoboWiFi-AP?
+
+**A:**
+```bash
+# If using git
+cd robowifi-ap
+git pull
+
+# Re-run setup if needed
+sudo ./setup.sh
 ```
 
 ---
@@ -504,22 +736,28 @@ ip addr show eth0
 
 ### Documentation
 - [Hostapd Documentation](https://w1.fi/hostapd/)
-- [Linux Wireless](https://wireless.wiki.kernel.org/)
-- [Aircrack-ng Wiki](https://www.aircrack-ng.org/)
+- [Linux Wireless Wiki](https://wireless.wiki.kernel.org/)
+- [Aircrack-ng Documentation](https://www.aircrack-ng.org/documentation.html)
+- [Kali Linux Wireless Tools](https://www.kali.org/tools/)
 
-### Compatible Adapters Database
-- https://wikidevi.wi-cat.ru/
-- https://deviwiki.com/
+### Wireless Adapter Databases
+- [WikiDevi](https://wikidevi.wi-cat.ru/)
+- [Linux Wireless Drivers](https://wireless.wiki.kernel.org/en/users/drivers)
 
-### Security Testing
+### Security Testing Guides
 - [OWASP Testing Guide](https://owasp.org/www-project-web-security-testing-guide/)
-- [Wireless Penetration Testing](https://www.offensive-security.com/)
+- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
+- [Penetration Testing Execution Standard](http://www.pentest-standard.org/)
+
+### Learning Resources
+- [WiFi Security Fundamentals](https://www.sans.org/white-papers/)
+- [Wireless Penetration Testing](https://www.offensive-security.com/metasploit-unleashed/)
 
 ---
 
 ## 📝 License
 
-This tool is provided for educational and authorized testing purposes only.
+This tool is provided for **educational** and **authorized testing** purposes only.
 
 **Use responsibly and legally.**
 
@@ -527,21 +765,60 @@ This tool is provided for educational and authorized testing purposes only.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please ensure all code:
-- Includes proper error handling
-- Has clear comments
-- Follows bash best practices
-- Includes security warnings where appropriate
+Contributions are welcome! Please ensure:
+- ✅ Proper error handling
+- ✅ Clear code comments
+- ✅ Security warnings included
+- ✅ Documentation updated
+- ✅ Testing on multiple systems
+
+**Pull requests should:**
+1. Follow existing code style
+2. Include descriptive commit messages
+3. Update documentation as needed
+4. Add security warnings for new features
 
 ---
 
 ## 📧 Support
 
-For issues and questions:
-1. Check the [Troubleshooting](#troubleshooting) section
-2. Run diagnostics: `sudo ./test.sh --full`
-3. Review logs in `/tmp/fakeap_*.log`
+### Getting Help
+
+1. **Check Documentation**: Read this README thoroughly
+2. **Run Diagnostics**: Use setup option [0] → [3]
+3. **Review Logs**: Check `/tmp/fakeap_*.log` and `/tmp/robowifi_setup_*.log`
+4. **Search Issues**: Check if your issue is already reported
+5. **Ask Community**: Open a GitHub issue with details
+
+### Reporting Issues
+
+Include:
+- Operating system and version
+- Wireless adapter model and chipset
+- Full error messages
+- Relevant log excerpts
+- Steps to reproduce
 
 ---
 
-**Remember: Use this tool ethically and legally. Happy (authorized) testing! 🔐**
+## ⚠️ Final Warning
+
+**This is a powerful security tool. Use it responsibly.**
+
+- ✅ Get **written authorization** before any testing
+- ✅ Test only on **networks you own**
+- ✅ Comply with **local laws and regulations**
+- ✅ **Secure and delete** logs after testing
+- ✅ Report **vulnerabilities responsibly**
+- ❌ **Never** use for unauthorized access
+- ❌ **Never** share captured credentials
+- ❌ **Never** target public networks without permission
+
+**Remember: With great power comes great responsibility.**
+
+---
+
+**RoboWiFi-AP** - WiFi Security Assessment Framework  
+*For authorized security testing and education only.*
+
+🔐 Stay legal. Stay ethical. Stay secure.
