@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RoboWiFi-AP — Wi‑Fi Security Assessment Framework</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(rgba(5,25,55,.88), rgba(5,25,55,.88)),
+                  url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b');
+      background-size: cover;
+      background-position: center;
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 60px;
+    }
+
+    header h1 {
+      font-size: 22px;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    nav a {
+      margin-left: 28px;
+      color: #cfe2ff;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    nav a:hover { color: #ffffff; }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 90px 10%;
+      gap: 50px;
+    }
+
+    .hero-text { max-width: 600px; }
+
+    .hero-text h2 {
+      font-size: 44px;
+      line-height: 1.2;
+      margin-bottom: 22px;
+    }
+
+    .hero-text p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #d7e9ff;
+      margin-bottom: 26px;
+    }
+
+    .badges {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(255,255,255,0.12);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .btn-download {
+      background: #ff9f1c;
+      color: #000;
+    }
+
+    .btn-docs {
+      background: #1e90ff;
+      color: #fff;
+    }
+
+    .hero-image {
+      font-size: 170px;
+      opacity: 0.9;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 18px;
+      width: 100%;
+      text-align: center;
+      font-size: 13px;
+      color: #aac7e6;
+    }
+
+    footer a { color: #ffb347; text-decoration: none; }
+
+    @media (max-width: 900px) {
+      .hero { flex-direction: column; text-align: center; }
+      header { flex-direction: column; gap: 10px; }
+      .hero-image { font-size: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>ROBO​WIFI‑AP</h1>
+    <nav>
+      <a href="#download">Download</a>
+      <a href="#docs">Documentation</a>
+      <a href="#features">Features</a>
+      <a href="https://github.com/KunalDharme/RoboWiFi-AP" target="_blank">GitHub</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="download">
+    <div class="hero-text">
+      <h2>Advanced Wi‑Fi Security<br>Assessment Framework</h2>
+      <p>
+        RoboWiFi‑AP is an open‑source wireless security toolkit designed for
+        authorized penetration testing, security research, and education.
+        It enables fake access point creation, credential capture,
+        traffic monitoring, and rogue AP detection.
+      </p>
+
+      <div class="badges">
+        <span class="badge">Fake Access Point</span>
+        <span class="badge">Captive Portal</span>
+        <span class="badge">WPA2 Capture</span>
+        <span class="badge">Packet Monitoring</span>
+        <span class="badge">Rogue AP Detection</span>
+        <span class="badge">Linux Only</span>
+      </div>
+
+      <div class="buttons">
+        <a href="https://github.com/KunalDharme/RoboWiFi-AP/archive/refs/heads/main.zip">
+          <button class="btn btn-download">⬇ Download Source (ZIP)</button>
+        </a>
+        <a href="https://github.com/KunalDharme/RoboWiFi-AP" target="_blank">
+          <button class="btn btn-docs">📘 View Documentation</button>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-image">📡</div>
+  </section>
+
+  <footer>
+    ⚠️ Authorized security testing only · MIT License · Developed by <strong>Kunal Dharme</strong> · 
+    <a href="https://github.com/KunalDharme/RoboWiFi-AP" target="_blank">GitHub Repository</a>
+  </footer>
+
+</body>
+</html>
