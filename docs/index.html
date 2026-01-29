@@ -6,32 +6,46 @@
   <title>RoboWiFi-AP — Wi‑Fi Security Assessment Framework</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: "Segoe UI", Arial, sans-serif;
-      background: linear-gradient(rgba(5,25,55,.88), rgba(5,25,55,.88)),
-                  url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b');
-      background-size: cover;
-      background-position: center;
+      background:
+        linear-gradient(120deg, rgba(20,0,0,0.92), rgba(60,0,0,0.85)),
+        radial-gradient(circle at top, rgba(255,60,60,0.15), transparent 60%);
       color: #ffffff;
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* subtle background plane */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(45deg, rgba(255,80,80,0.06) 1px, transparent 1px),
+        linear-gradient(-45deg, rgba(255,80,80,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
     }
 
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 22px 60px;
+      padding: 18px 60px;
     }
 
     header h1 {
       font-size: 22px;
-      letter-spacing: 1px;
-      font-weight: 700;
+      letter-spacing: 1.5px;
+      font-weight: 800;
+      color: #ff4d4d;
     }
 
     nav a {
       margin-left: 28px;
-      color: #cfe2ff;
+      color: #ffd6d6;
       text-decoration: none;
       font-size: 14px;
     }
@@ -41,36 +55,101 @@
     .hero {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 90px 10%;
-      gap: 50px;
+      justify-content: flex-start;
+      padding: 60px 10% 40px;
+      gap: 40px;
+      position: relative;
+      z-index: 1;
+      min-height: calc(100vh - 140px);
     }
 
-    .hero-text { max-width: 600px; }
+    .hero-text {
+      max-width: 620px;
+      margin-left: +20px; /* adjust: -40px to -80px */
+    }
+
+    /* animations */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.8s ease-out forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.25s; }
+    .delay-3 { animation-delay: 0.4s; }
+    .delay-4 { animation-delay: 0.55s; }
+    .delay-5 { animation-delay: 0.7s; }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
     .hero-text h2 {
-      font-size: 44px;
+      font-size: 38px;
       line-height: 1.2;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
+    }
+
+    .hero-text h2 span {
+      color: #ff4d4d;
+    }
+        /* background developer name */
+    .bg-name {
+      position: absolute;
+      right: 6%;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 120px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      line-height: 1.05;
+      color: rgba(255, 80, 80, 0.06);
+      text-align: right;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .bg-name span {
+      display: block;
+      font-size: 34px;
+      letter-spacing: 4px;
+      margin-top: 12px;
+    }
+    .dev-tag {
+      margin-bottom: 14px;
+      font-size: 13px;
+      letter-spacing: 0.4px;
+      color: #ffbcbc;
+    }
+
+    .dev-tag strong {
+      color: #ff4d4d;
+      font-weight: 700;
     }
 
     .hero-text p {
-      font-size: 16px;
-      line-height: 1.7;
-      color: #d7e9ff;
-      margin-bottom: 26px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #ffdede;
+      margin-bottom: 22px;
     }
 
     .badges {
       display: flex;
-      gap: 12px;
-      margin-bottom: 30px;
+      gap: 10px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
     }
 
     .badge {
-      background: rgba(255,255,255,0.12);
-      padding: 6px 14px;
+      background: rgba(255,70,70,0.14);
+      border: 1px solid rgba(255,70,70,0.35);
+      padding: 7px 16px;
       border-radius: 20px;
       font-size: 12px;
     }
@@ -82,45 +161,63 @@
     }
 
     .btn {
-      padding: 14px 32px;
+      padding: 12px 28px;
       border-radius: 6px;
       border: none;
       cursor: pointer;
-      font-size: 15px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 700;
     }
 
     .btn-download {
-      background: #ff9f1c;
-      color: #000;
+      background: linear-gradient(135deg, #ff4d4d, #ff1f1f);
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(255,60,60,0.35);
     }
 
     .btn-docs {
-      background: #1e90ff;
-      color: #fff;
+      background: transparent;
+      color: #ffb3b3;
+      border: 1px solid rgba(255,120,120,0.6);
     }
 
     .hero-image {
       font-size: 170px;
-      opacity: 0.9;
+      filter: drop-shadow(0 0 30px rgba(255,80,80,0.4));
+      opacity: 0.95;
     }
 
     footer {
       position: absolute;
-      bottom: 18px;
+      bottom: 12px;
       width: 100%;
       text-align: center;
-      font-size: 13px;
-      color: #aac7e6;
+      font-size: 12px;
+      color: #ffbcbc;
     }
 
-    footer a { color: #ffb347; text-decoration: none; }
+    footer strong {
+      color: #ff4d4d;
+      font-weight: 800;
+    }
+
+    footer a { color: #ff8f8f; text-decoration: none; }
+
+    @media (max-width: 1366px) {
+      .hero {
+        padding: 50px 8% 32px;
+        min-height: calc(100vh - 150px);
+      }
+      .hero-text h2 { font-size: 34px; }
+    }
 
     @media (max-width: 900px) {
       .hero { flex-direction: column; text-align: center; }
       header { flex-direction: column; gap: 10px; }
-      .hero-image { font-size: 120px; }
     }
+      header { flex-direction: column; gap: 10px; }
+      .hero-image { font-size: 120px; }
+      
   </style>
 </head>
 <body>
@@ -128,24 +225,26 @@
   <header>
     <h1>ROBO​WIFI‑AP</h1>
     <nav>
-      <a href="#download">Download</a>
-      <a href="#docs">Documentation</a>
-      <a href="#features">Features</a>
+      <a href="https://github.com/KunalDharme/RoboWiFi-AP/archive/refs/heads/main.zip">Download</a>
+      <a href="https://github.com/KunalDharme/RoboWiFi-AP#readme" target="_blank">Documentation</a>
+      <a href="mailto:kunaldharme13@gmail.com">Contact</a>
       <a href="https://github.com/KunalDharme/RoboWiFi-AP" target="_blank">GitHub</a>
     </nav>
   </header>
 
   <section class="hero" id="download">
+    <div class="bg-name">KUNAL DHARME<br><span>SECURITY DEVELOPER</span></div>
     <div class="hero-text">
-      <h2>Advanced Wi‑Fi Security<br>Assessment Framework</h2>
-      <p>
+      <h2 class="fade-up delay-1">Advanced Wi‑Fi Security<br><span>Assessment Framework</span></h2>
+      <div class="dev-tag fade-up delay-2">Built & maintained by <strong>Kunal Dharme</strong></div>
+      <p class="fade-up delay-3">
         RoboWiFi‑AP is an open‑source wireless security toolkit designed for
         authorized penetration testing, security research, and education.
         It enables fake access point creation, credential capture,
         traffic monitoring, and rogue AP detection.
       </p>
 
-      <div class="badges">
+      <div class="badges fade-up delay-4">
         <span class="badge">Fake Access Point</span>
         <span class="badge">Captive Portal</span>
         <span class="badge">WPA2 Capture</span>
@@ -154,7 +253,7 @@
         <span class="badge">Linux Only</span>
       </div>
 
-      <div class="buttons">
+      <div class="buttons fade-up delay-5">
         <a href="https://github.com/KunalDharme/RoboWiFi-AP/archive/refs/heads/main.zip">
           <button class="btn btn-download">⬇ Download Source (ZIP)</button>
         </a>
@@ -164,11 +263,11 @@
       </div>
     </div>
 
-    <div class="hero-image">📡</div>
+    
   </section>
 
   <footer>
-    ⚠️ Authorized security testing only · MIT License · Developed by <strong>Kunal Dharme</strong> · 
+    ⚠️ Authorized security testing only · MIT License · Developed by <strong>Kunal Dharme</strong> ·
     <a href="https://github.com/KunalDharme/RoboWiFi-AP" target="_blank">GitHub Repository</a>
   </footer>
 
