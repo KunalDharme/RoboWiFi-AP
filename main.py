@@ -509,72 +509,435 @@ def launch_script(script_path, script_type):
         return True
         
     elif script_type == 'defender':
-        print(f"{Fore.WHITE}Defender Mode Options:{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}Defender Mode - Rogue AP Detection & Defense System{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'='*75}{Style.RESET_ALL}")
+        print(f"\n{Fore.YELLOW}╔════════════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}║                    MAIN DEFENDER MENU                          ║{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}╚════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+        
+        print(f"{Fore.GREEN}▶ SCANNING & MONITORING{Style.RESET_ALL}")
         print(f"{Fore.CYAN}  [1]{Fore.WHITE} Quick Scan - Scan for rogue access points")
-        print(f"{Fore.CYAN}  [2]{Fore.WHITE} Monitor Mode - Continuous monitoring")
-        print(f"{Fore.CYAN}  [3]{Fore.WHITE} Custom Command - Enter your own arguments")
-        print(f"{Fore.CYAN}  [4]{Fore.WHITE} Help - Show all available options")
-        print(f"{Fore.CYAN}  [5]{Fore.WHITE} Back to Main Menu")
-        print(f"{Fore.YELLOW}{'='*65}{Style.RESET_ALL}\n")
+        print(f"{Fore.CYAN}  [2]{Fore.WHITE} Monitor Mode - Continuous real-time monitoring")
+        print(f"{Fore.CYAN}  [3]{Fore.WHITE} Advanced Monitor - Deep packet inspection & analysis")
+        print(f"{Fore.CYAN}  [4]{Fore.WHITE} Baseline Creation - Establish trusted AP baseline")
+        
+        print(f"\n{Fore.GREEN}▶ THREAT ANALYSIS & REPORTING{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}  [5]{Fore.WHITE} Threat Dashboard - View live threat scoring")
+        print(f"{Fore.CYAN}  [6]{Fore.WHITE} Security Report - Generate comprehensive report")
+        print(f"{Fore.CYAN}  [7]{Fore.WHITE} Analyze Log File - Forensic analysis of captured data")
+        print(f"{Fore.CYAN}  [8]{Fore.WHITE} Client Tracking - View tracked client devices")
+        
+        print(f"\n{Fore.GREEN}▶ PROTECTION & MANAGEMENT{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}  [9]{Fore.WHITE} Protect Network - Add AP to protection whitelist")
+        print(f"{Fore.CYAN} [10]{Fore.WHITE} Whitelist Manager - Manage trusted APs")
+        print(f"{Fore.CYAN} [11]{Fore.WHITE} Blacklist Manager - Manage known rogue APs")
+        
+        print(f"\n{Fore.GREEN}▶ ADVANCED OPTIONS{Style.RESET_ALL}")
+        print(f"{Fore.CYAN} [12]{Fore.WHITE} Alert Configuration - Configure email/webhook/Telegram alerts")
+        print(f"{Fore.CYAN} [13]{Fore.WHITE} Detection Settings - Adjust sensitivity and features")
+        print(f"{Fore.CYAN} [14]{Fore.WHITE} Custom Command - Execute custom defender arguments")
+        
+        print(f"\n{Fore.GREEN}▶ SYSTEM{Style.RESET_ALL}")
+        print(f"{Fore.CYAN} [15]{Fore.WHITE} Help - Display comprehensive help menu")
+        print(f"{Fore.CYAN} [16]{Fore.WHITE} View Logs - Quick access to log files")
+        print(f"{Fore.CYAN} [17]{Fore.WHITE} Back to Main Menu")
+        print(f"{Fore.YELLOW}{'='*75}{Style.RESET_ALL}\n")
         
         while True:
-            choice = input(f"{Fore.YELLOW}Select defender option [1-5]: {Style.RESET_ALL}").strip()
+            choice = input(f"{Fore.YELLOW}Select option [1-17]: {Style.RESET_ALL}").strip()
             
             if choice == '1':
                 # Quick scan
-                print(f"\n{Fore.GREEN}Starting quick scan for rogue APs...{Style.RESET_ALL}\n")
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║              QUICK ROGUE AP SCAN                       ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                # Get wireless interface
+                interfaces = get_wireless_interfaces()
+                if not interfaces:
+                    print(f"{Fore.RED}No wireless interfaces found!{Style.RESET_ALL}")
+                    input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                    continue
+                
+                print(f"{Fore.WHITE}Available interfaces: {', '.join(interfaces)}{Style.RESET_ALL}")
+                iface = input(f"{Fore.YELLOW}Enter interface (default: {interfaces[0]}): {Style.RESET_ALL}").strip()
+                if not iface:
+                    iface = interfaces[0]
+                
+                print(f"\n{Fore.GREEN}Starting quick scan on {iface}...{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}This will scan for:{Style.RESET_ALL}")
+                print(f"  • Evil Twin APs (duplicate SSIDs)")
+                print(f"  • Rogue Access Points")
+                print(f"  • Signal anomalies")
+                print(f"  • Captive portals")
+                print(f"  • Encryption downgrades\n")
+                
                 try:
-                    subprocess.run(["bash", script_path, "--scan"], check=False)
+                    subprocess.run(["bash", script_path, "--scan", iface], check=False)
                 except KeyboardInterrupt:
                     print(f"\n{Fore.YELLOW}Scan interrupted by user.{Style.RESET_ALL}")
                 
-                print(f"\n{Fore.CYAN}Scan complete. Returning to main menu...{Style.RESET_ALL}")
-                input(f"{Fore.GREEN}Press ENTER to continue...{Style.RESET_ALL}")
-                return True
+                print(f"\n{Fore.GREEN}Scan complete!{Style.RESET_ALL}")
+                input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
                 
             elif choice == '2':
-                # Monitor mode
-                print(f"\n{Fore.CYAN}Available wireless interfaces:{Style.RESET_ALL}")
-                try:
-                    result = subprocess.run(['iw', 'dev'], capture_output=True, text=True)
-                    interfaces = []
-                    for line in result.stdout.split('\n'):
-                        if 'Interface' in line:
-                            iface = line.split()[-1]
-                            interfaces.append(iface)
-                            print(f"  • {iface}")
-                    
-                    if interfaces:
-                        iface = input(f"\n{Fore.YELLOW}Enter interface to monitor (default: {interfaces[0]}): {Style.RESET_ALL}").strip()
-                        if not iface:
-                            iface = interfaces[0]
-                        print(f"\n{Fore.GREEN}Starting continuous monitoring on {iface}...{Style.RESET_ALL}\n")
-                        
-                        try:
-                            subprocess.run(["bash", script_path, "--monitor", iface], check=False)
-                        except KeyboardInterrupt:
-                            print(f"\n{Fore.YELLOW}Monitoring interrupted by user.{Style.RESET_ALL}")
-                        
-                        print(f"\n{Fore.CYAN}Monitoring stopped. Returning to main menu...{Style.RESET_ALL}")
-                        input(f"{Fore.GREEN}Press ENTER to continue...{Style.RESET_ALL}")
-                        return True
-                    else:
-                        print(f"{Fore.RED}No wireless interfaces found!{Style.RESET_ALL}")
-                        input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
-                        return True
-                except Exception as e:
-                    print(f"{Fore.RED}Error detecting interfaces: {e}{Style.RESET_ALL}")
+                # Basic monitor mode
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║           CONTINUOUS MONITORING MODE                   ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                interfaces = get_wireless_interfaces()
+                if not interfaces:
+                    print(f"{Fore.RED}No wireless interfaces found!{Style.RESET_ALL}")
                     input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
-                    return True
-                    
+                    continue
+                
+                print(f"{Fore.WHITE}Available interfaces: {', '.join(interfaces)}{Style.RESET_ALL}")
+                iface = input(f"{Fore.YELLOW}Enter interface (default: {interfaces[0]}): {Style.RESET_ALL}").strip()
+                if not iface:
+                    iface = interfaces[0]
+                
+                interval = input(f"{Fore.YELLOW}Scan interval in seconds (default: 10): {Style.RESET_ALL}").strip()
+                if not interval:
+                    interval = "10"
+                
+                print(f"\n{Fore.GREEN}Starting continuous monitoring on {iface} (interval: {interval}s)...{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}Monitoring for:{Style.RESET_ALL}")
+                print(f"  • Rogue APs")
+                print(f"  • Deauth attacks")
+                print(f"  • Evil twins")
+                print(f"  • Signal anomalies")
+                print(f"\n{Fore.RED}Press CTRL+C to stop monitoring{Style.RESET_ALL}\n")
+                
+                try:
+                    subprocess.run(["bash", script_path, "--monitor", iface, interval], check=False)
+                except KeyboardInterrupt:
+                    print(f"\n{Fore.YELLOW}Monitoring stopped by user.{Style.RESET_ALL}")
+                
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
             elif choice == '3':
+                # Advanced monitor with deep inspection
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║        ADVANCED MONITORING WITH DEEP INSPECTION        ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                interfaces = get_wireless_interfaces()
+                if not interfaces:
+                    print(f"{Fore.RED}No wireless interfaces found!{Style.RESET_ALL}")
+                    input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                    continue
+                
+                print(f"{Fore.WHITE}Available interfaces: {', '.join(interfaces)}{Style.RESET_ALL}")
+                iface = input(f"{Fore.YELLOW}Enter interface (default: {interfaces[0]}): {Style.RESET_ALL}").strip()
+                if not iface:
+                    iface = interfaces[0]
+                
+                print(f"\n{Fore.YELLOW}Select advanced features to enable:{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}  [1]{Fore.WHITE} All features (recommended)")
+                print(f"{Fore.CYAN}  [2]{Fore.WHITE} Deep packet inspection only")
+                print(f"{Fore.CYAN}  [3]{Fore.WHITE} DNS & ARP monitoring")
+                print(f"{Fore.CYAN}  [4]{Fore.WHITE} Client fingerprinting & probe tracking")
+                print(f"{Fore.CYAN}  [5]{Fore.WHITE} Custom selection")
+                
+                feature_choice = input(f"{Fore.YELLOW}Select [1-5]: {Style.RESET_ALL}").strip()
+                
+                cmd = ["bash", script_path, "--monitor", iface]
+                
+                if feature_choice == '1':
+                    cmd.extend([
+                        "--deep-inspection",
+                        "--capture-packets",
+                        "--analyze-dns",
+                        "--analyze-arp",
+                        "--track-probes",
+                        "--fingerprint-clients"
+                    ])
+                elif feature_choice == '2':
+                    cmd.extend(["--deep-inspection", "--capture-packets"])
+                elif feature_choice == '3':
+                    cmd.extend(["--analyze-dns", "--analyze-arp"])
+                elif feature_choice == '4':
+                    cmd.extend(["--track-probes", "--fingerprint-clients"])
+                elif feature_choice == '5':
+                    print(f"\n{Fore.YELLOW}Enable features (y/n):{Style.RESET_ALL}")
+                    if input(f"  Deep packet inspection? ").lower() == 'y':
+                        cmd.append("--deep-inspection")
+                    if input(f"  Capture packets? ").lower() == 'y':
+                        cmd.append("--capture-packets")
+                    if input(f"  DNS monitoring? ").lower() == 'y':
+                        cmd.append("--analyze-dns")
+                    if input(f"  ARP monitoring? ").lower() == 'y':
+                        cmd.append("--analyze-arp")
+                    if input(f"  Track probe requests? ").lower() == 'y':
+                        cmd.append("--track-probes")
+                    if input(f"  Fingerprint clients? ").lower() == 'y':
+                        cmd.append("--fingerprint-clients")
+                
+                print(f"\n{Fore.GREEN}Starting advanced monitoring...{Style.RESET_ALL}")
+                print(f"{Fore.RED}Press CTRL+C to stop{Style.RESET_ALL}\n")
+                
+                try:
+                    subprocess.run(cmd, check=False)
+                except KeyboardInterrupt:
+                    print(f"\n{Fore.YELLOW}Monitoring stopped by user.{Style.RESET_ALL}")
+                
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '4':
+                # Create baseline
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║              BASELINE CREATION                         ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.YELLOW}This will scan your network and create a baseline of{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}legitimate access points for future comparison.{Style.RESET_ALL}\n")
+                
+                interfaces = get_wireless_interfaces()
+                if not interfaces:
+                    print(f"{Fore.RED}No wireless interfaces found!{Style.RESET_ALL}")
+                    input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                    continue
+                
+                iface = input(f"{Fore.YELLOW}Enter interface (default: {interfaces[0]}): {Style.RESET_ALL}").strip()
+                if not iface:
+                    iface = interfaces[0]
+                
+                print(f"\n{Fore.GREEN}Creating baseline on {iface}...{Style.RESET_ALL}\n")
+                
+                try:
+                    subprocess.run(["bash", script_path, "--baseline", iface], check=False)
+                except KeyboardInterrupt:
+                    print(f"\n{Fore.YELLOW}Baseline creation interrupted.{Style.RESET_ALL}")
+                
+                print(f"\n{Fore.GREEN}Baseline created successfully!{Style.RESET_ALL}")
+                input(f"{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '5':
+                # Threat dashboard
+                print(f"\n{Fore.GREEN}Launching threat dashboard...{Style.RESET_ALL}\n")
+                try:
+                    subprocess.run(["bash", script_path, "--threats"], check=False)
+                except KeyboardInterrupt:
+                    print(f"\n{Fore.YELLOW}Dashboard closed.{Style.RESET_ALL}")
+                
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '6':
+                # Security report
+                print(f"\n{Fore.GREEN}Generating comprehensive security report...{Style.RESET_ALL}\n")
+                try:
+                    subprocess.run(["bash", script_path, "--report"], check=False)
+                except KeyboardInterrupt:
+                    print(f"\n{Fore.YELLOW}Report generation interrupted.{Style.RESET_ALL}")
+                
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '7':
+                # Analyze log file
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║              LOG FILE ANALYSIS                         ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.YELLOW}Common log file locations:{Style.RESET_ALL}")
+                print(f"  • /tmp/fake_ap_detector/scan_results.log")
+                print(f"  • /tmp/fake_ap_detector/monitor.log")
+                print(f"  • /tmp/fake_ap_detector/alerts.log\n")
+                
+                log_file = input(f"{Fore.YELLOW}Enter log file path: {Style.RESET_ALL}").strip()
+                
+                if log_file and os.path.exists(log_file):
+                    print(f"\n{Fore.GREEN}Analyzing {log_file}...{Style.RESET_ALL}\n")
+                    try:
+                        subprocess.run(["bash", script_path, "--analyze", log_file], check=False)
+                    except KeyboardInterrupt:
+                        print(f"\n{Fore.YELLOW}Analysis interrupted.{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}File not found or invalid path!{Style.RESET_ALL}")
+                
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '8':
+                # Client tracking
+                print(f"\n{Fore.GREEN}Displaying tracked clients...{Style.RESET_ALL}\n")
+                try:
+                    subprocess.run(["bash", script_path, "--clients"], check=False)
+                except KeyboardInterrupt:
+                    print(f"\n{Fore.YELLOW}Client list closed.{Style.RESET_ALL}")
+                
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '9':
+                # Protect network
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║           NETWORK PROTECTION SETUP                     ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.YELLOW}This will protect a specific AP and alert on any clones.{Style.RESET_ALL}\n")
+                
+                ssid = input(f"{Fore.YELLOW}Enter network SSID: {Style.RESET_ALL}").strip()
+                bssid = input(f"{Fore.YELLOW}Enter AP BSSID (MAC address): {Style.RESET_ALL}").strip()
+                
+                if ssid and bssid:
+                    print(f"\n{Fore.GREEN}Adding {ssid} ({bssid}) to protection whitelist...{Style.RESET_ALL}\n")
+                    try:
+                        subprocess.run(["bash", script_path, "--protect", ssid, bssid], check=False)
+                    except Exception as e:
+                        print(f"{Fore.RED}Error: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}Both SSID and BSSID are required!{Style.RESET_ALL}")
+                
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '10':
+                # Whitelist manager
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║              WHITELIST MANAGER                         ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.CYAN}  [1]{Fore.WHITE} Add BSSID to whitelist")
+                print(f"{Fore.CYAN}  [2]{Fore.WHITE} View current whitelist")
+                print(f"{Fore.CYAN}  [3]{Fore.WHITE} Remove from whitelist")
+                print(f"{Fore.CYAN}  [4]{Fore.WHITE} Back\n")
+                
+                wl_choice = input(f"{Fore.YELLOW}Select [1-4]: {Style.RESET_ALL}").strip()
+                
+                if wl_choice == '1':
+                    bssid = input(f"{Fore.YELLOW}Enter BSSID to whitelist: {Style.RESET_ALL}").strip()
+                    if bssid:
+                        try:
+                            subprocess.run(["bash", script_path, "--whitelist", bssid], check=False)
+                        except Exception as e:
+                            print(f"{Fore.RED}Error: {e}{Style.RESET_ALL}")
+                    input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                elif wl_choice == '2':
+                    whitelist_file = "/tmp/fake_ap_detector/whitelist.txt"
+                    if os.path.exists(whitelist_file):
+                        print(f"\n{Fore.GREEN}Current whitelist:{Style.RESET_ALL}\n")
+                        with open(whitelist_file, 'r') as f:
+                            for line in f:
+                                print(f"  • {line.strip()}")
+                    else:
+                        print(f"{Fore.YELLOW}Whitelist is empty{Style.RESET_ALL}")
+                    input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                elif wl_choice == '3':
+                    print(f"{Fore.YELLOW}Manual editing required: /tmp/fake_ap_detector/whitelist.txt{Style.RESET_ALL}")
+                    input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '11':
+                # Blacklist manager
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║              BLACKLIST MANAGER                         ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.CYAN}  [1]{Fore.WHITE} Add BSSID to blacklist")
+                print(f"{Fore.CYAN}  [2]{Fore.WHITE} View current blacklist")
+                print(f"{Fore.CYAN}  [3]{Fore.WHITE} Remove from blacklist")
+                print(f"{Fore.CYAN}  [4]{Fore.WHITE} Back\n")
+                
+                bl_choice = input(f"{Fore.YELLOW}Select [1-4]: {Style.RESET_ALL}").strip()
+                
+                if bl_choice == '1':
+                    bssid = input(f"{Fore.YELLOW}Enter BSSID to blacklist: {Style.RESET_ALL}").strip()
+                    if bssid:
+                        try:
+                            subprocess.run(["bash", script_path, "--blacklist", bssid], check=False)
+                        except Exception as e:
+                            print(f"{Fore.RED}Error: {e}{Style.RESET_ALL}")
+                    input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                elif bl_choice == '2':
+                    blacklist_file = "/tmp/fake_ap_detector/blacklist.txt"
+                    if os.path.exists(blacklist_file):
+                        print(f"\n{Fore.RED}Current blacklist:{Style.RESET_ALL}\n")
+                        with open(blacklist_file, 'r') as f:
+                            for line in f:
+                                print(f"  • {line.strip()}")
+                    else:
+                        print(f"{Fore.YELLOW}Blacklist is empty{Style.RESET_ALL}")
+                    input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                elif bl_choice == '3':
+                    print(f"{Fore.YELLOW}Manual editing required: /tmp/fake_ap_detector/blacklist.txt{Style.RESET_ALL}")
+                    input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '12':
+                # Alert configuration
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║           ALERT CONFIGURATION                          ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.YELLOW}Configure alert methods for monitoring mode:{Style.RESET_ALL}\n")
+                print(f"{Fore.CYAN}  [1]{Fore.WHITE} Email alerts")
+                print(f"{Fore.CYAN}  [2]{Fore.WHITE} Webhook alerts")
+                print(f"{Fore.CYAN}  [3]{Fore.WHITE} Slack alerts")
+                print(f"{Fore.CYAN}  [4]{Fore.WHITE} Telegram alerts")
+                print(f"{Fore.CYAN}  [5]{Fore.WHITE} Sound alerts (toggle)")
+                print(f"{Fore.CYAN}  [6]{Fore.WHITE} Desktop notifications (toggle)")
+                print(f"{Fore.CYAN}  [7]{Fore.WHITE} Back\n")
+                
+                alert_choice = input(f"{Fore.YELLOW}Select [1-7]: {Style.RESET_ALL}").strip()
+                
+                if alert_choice == '1':
+                    email = input(f"{Fore.YELLOW}Enter email address: {Style.RESET_ALL}").strip()
+                    print(f"{Fore.GREEN}Email alerts configured: {email}{Style.RESET_ALL}")
+                    print(f"{Fore.CYAN}Use with: --alert-email {email}{Style.RESET_ALL}")
+                elif alert_choice == '2':
+                    webhook = input(f"{Fore.YELLOW}Enter webhook URL: {Style.RESET_ALL}").strip()
+                    print(f"{Fore.GREEN}Webhook configured{Style.RESET_ALL}")
+                    print(f"{Fore.CYAN}Use with: --alert-webhook {webhook}{Style.RESET_ALL}")
+                elif alert_choice == '3':
+                    slack = input(f"{Fore.YELLOW}Enter Slack webhook URL: {Style.RESET_ALL}").strip()
+                    print(f"{Fore.GREEN}Slack alerts configured{Style.RESET_ALL}")
+                    print(f"{Fore.CYAN}Use with: --alert-slack {slack}{Style.RESET_ALL}")
+                elif alert_choice == '4':
+                    token = input(f"{Fore.YELLOW}Enter Telegram bot token: {Style.RESET_ALL}").strip()
+                    chat_id = input(f"{Fore.YELLOW}Enter Telegram chat ID: {Style.RESET_ALL}").strip()
+                    print(f"{Fore.GREEN}Telegram alerts configured{Style.RESET_ALL}")
+                    print(f"{Fore.CYAN}Use with: --alert-telegram {token} {chat_id}{Style.RESET_ALL}")
+                elif alert_choice in ['5', '6']:
+                    flag = "--sound-alert" if alert_choice == '5' else "--no-notify"
+                    print(f"{Fore.GREEN}Add {flag} to monitoring command{Style.RESET_ALL}")
+                
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '13':
+                # Detection settings
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║           DETECTION SETTINGS                           ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.YELLOW}Available detection features:{Style.RESET_ALL}\n")
+                print(f"{Fore.GREEN}✓ Evil Twin Detection{Style.RESET_ALL} - Detect duplicate SSIDs")
+                print(f"{Fore.GREEN}✓ Rogue AP Detection{Style.RESET_ALL} - Identify unauthorized APs")
+                print(f"{Fore.GREEN}✓ Deauth Attack Detection{Style.RESET_ALL} - Alert on deauth floods")
+                print(f"{Fore.GREEN}✓ Signal Anomaly Detection{Style.RESET_ALL} - Detect suspicious signals")
+                print(f"{Fore.GREEN}✓ Encryption Downgrade Alert{Style.RESET_ALL} - Warn when encryption weakens")
+                print(f"{Fore.GREEN}✓ Channel Switching Detection{Style.RESET_ALL} - Track channel changes")
+                print(f"{Fore.GREEN}✓ MAC Vendor Analysis{Style.RESET_ALL} - Identify suspicious manufacturers")
+                print(f"{Fore.GREEN}✓ Captive Portal Detection{Style.RESET_ALL} - Detect fake login portals")
+                print(f"{Fore.GREEN}✓ KARMA Attack Detection{Style.RESET_ALL} - Identify promiscuous APs")
+                print(f"\n{Fore.CYAN}Advanced Features (enabled via flags):{Style.RESET_ALL}")
+                print(f"  • DNS Spoofing Detection (--analyze-dns)")
+                print(f"  • ARP Spoofing Detection (--analyze-arp)")
+                print(f"  • Deep Packet Inspection (--deep-inspection)")
+                print(f"  • Client Fingerprinting (--fingerprint-clients)")
+                print(f"  • Probe Request Tracking (--track-probes)")
+                print(f"  • Packet Capture (--capture-packets)")
+                
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '14':
                 # Custom command
-                print(f"\n{Fore.CYAN}Enter custom arguments for fake_ap_detector.sh{Style.RESET_ALL}")
-                print(f"{Fore.WHITE}Examples:{Style.RESET_ALL}")
-                print(f"  --scan")
-                print(f"  --monitor wlan0")
-                print(f"  --protect \"MyNetwork\" \"AA:BB:CC:DD:EE:FF\"")
-                print(f"  --analyze /path/to/logfile")
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║              CUSTOM COMMAND EXECUTION                  ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.WHITE}Enter custom arguments for fake_ap_detector.sh{Style.RESET_ALL}")
+                print(f"\n{Fore.YELLOW}Examples:{Style.RESET_ALL}")
+                print(f"  {Fore.CYAN}--scan wlan0{Style.RESET_ALL}")
+                print(f"  {Fore.CYAN}--monitor wlan0 --deep-inspection --analyze-dns{Style.RESET_ALL}")
+                print(f"  {Fore.CYAN}--protect \"MyNetwork\" \"AA:BB:CC:DD:EE:FF\"{Style.RESET_ALL}")
+                print(f"  {Fore.CYAN}--analyze /tmp/fake_ap_detector/scan_results.log{Style.RESET_ALL}")
+                print(f"  {Fore.CYAN}--monitor wlan0 --alert-email user@example.com --sound-alert{Style.RESET_ALL}")
                 
                 args = input(f"\n{Fore.YELLOW}Arguments: {Style.RESET_ALL}").strip()
                 if args:
@@ -583,32 +946,95 @@ def launch_script(script_path, script_type):
                         subprocess.run(["bash", script_path] + args.split(), check=False)
                     except KeyboardInterrupt:
                         print(f"\n{Fore.YELLOW}Command interrupted by user.{Style.RESET_ALL}")
-                    
-                    print(f"\n{Fore.CYAN}Command finished. Returning to main menu...{Style.RESET_ALL}")
-                    input(f"{Fore.GREEN}Press ENTER to continue...{Style.RESET_ALL}")
-                    return True
                 else:
                     print(f"{Fore.RED}No arguments provided.{Style.RESET_ALL}")
-                    continue
-                    
-            elif choice == '4':
+                
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '15':
                 # Show help
-                print(f"\n{Fore.GREEN}Displaying help menu...{Style.RESET_ALL}\n")
+                print(f"\n{Fore.GREEN}Displaying comprehensive help menu...{Style.RESET_ALL}\n")
                 try:
                     subprocess.run(["bash", script_path, "--help"], check=False)
                 except KeyboardInterrupt:
                     print(f"\n{Fore.YELLOW}Help interrupted.{Style.RESET_ALL}")
                 
-                input(f"\n{Fore.GREEN}Press ENTER to continue...{Style.RESET_ALL}")
-                continue  # Stay in defender menu
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
                 
-            elif choice == '5':
+            elif choice == '16':
+                # View logs
+                print(f"\n{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║              LOG FILE VIEWER                           ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+                
+                log_dir = "/tmp/fake_ap_detector"
+                log_files = {
+                    '1': ('scan_results.log', 'Scan Results'),
+                    '2': ('monitor.log', 'Monitor Log'),
+                    '3': ('alerts.log', 'Security Alerts'),
+                    '4': ('rogue_aps.db', 'Rogue APs Database'),
+                    '5': ('threat_scores.log', 'Threat Scores'),
+                    '6': ('deauth_attacks.log', 'Deauth Attacks'),
+                    '7': ('client_tracking.db', 'Client Tracking'),
+                    '8': ('dns_spoofing.log', 'DNS Spoofing'),
+                    '9': ('arp_spoofing.log', 'ARP Spoofing')
+                }
+                
+                print(f"{Fore.YELLOW}Available log files:{Style.RESET_ALL}\n")
+                for key, (filename, description) in log_files.items():
+                    filepath = os.path.join(log_dir, filename)
+                    exists = "✓" if os.path.exists(filepath) else "✗"
+                    color = Fore.GREEN if exists == "✓" else Fore.RED
+                    print(f"{Fore.CYAN}  [{key}]{Style.RESET_ALL} {color}{exists}{Style.RESET_ALL} {description} ({filename})")
+                
+                print(f"{Fore.CYAN}  [0]{Style.RESET_ALL} Back\n")
+                
+                log_choice = input(f"{Fore.YELLOW}Select log to view [0-9]: {Style.RESET_ALL}").strip()
+                
+                if log_choice in log_files:
+                    filename, description = log_files[log_choice]
+                    filepath = os.path.join(log_dir, filename)
+                    
+                    if os.path.exists(filepath):
+                        print(f"\n{Fore.GREEN}=== {description} ==={Style.RESET_ALL}\n")
+                        try:
+                            with open(filepath, 'r') as f:
+                                lines = f.readlines()
+                                if len(lines) > 50:
+                                    print(f"{Fore.YELLOW}Showing last 50 lines:{Style.RESET_ALL}\n")
+                                    for line in lines[-50:]:
+                                        print(line.rstrip())
+                                else:
+                                    for line in lines:
+                                        print(line.rstrip())
+                        except Exception as e:
+                            print(f"{Fore.RED}Error reading file: {e}{Style.RESET_ALL}")
+                    else:
+                        print(f"{Fore.RED}Log file not found: {filepath}{Style.RESET_ALL}")
+                
+                input(f"\n{Fore.CYAN}Press ENTER to continue...{Style.RESET_ALL}")
+                
+            elif choice == '17':
                 # Back to main menu
                 print(f"\n{Fore.CYAN}Returning to main menu...{Style.RESET_ALL}")
                 return True
                 
             else:
-                print(f"{Fore.RED}Invalid option. Please select 1-5.{Style.RESET_ALL}")
+                print(f"{Fore.RED}Invalid option. Please select 1-17.{Style.RESET_ALL}")
+
+
+def get_wireless_interfaces():
+    """Helper function to get available wireless interfaces"""
+    try:
+        result = subprocess.run(['iw', 'dev'], capture_output=True, text=True)
+        interfaces = []
+        for line in result.stdout.split('\n'):
+            if 'Interface' in line:
+                iface = line.split()[-1]
+                interfaces.append(iface)
+        return interfaces
+    except Exception:
+        return []
 
 def main():
     """Main program flow"""
