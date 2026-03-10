@@ -630,17 +630,9 @@ show_attack_menu() {
     echo -e "    ${CYAN}→ Disconnect clients from network${NC}"
     echo -e "    ${CYAN}→ Best for: Testing DoS protection${NC}\n"
     
-    echo -e "${GREEN}[5]${NC} Evil Twin Attack"
-    echo -e "    ${CYAN}→ Create fake AP to capture credentials${NC}"
-    echo -e "    ${CYAN}→ Best for: Testing user awareness${NC}\n"
-    
-    echo -e "${GREEN}[6]${NC} Automated Multi-Attack"
-    echo -e "    ${CYAN}→ Try multiple methods automatically${NC}"
-    echo -e "    ${CYAN}→ Best for: Comprehensive testing${NC}\n"
-    
     echo -e "${GREEN}[0]${NC} Back to main menu\n"
     
-    read -p "Select attack [1-6]: " attack_choice
+    read -p "Select attack [1-4]: " attack_choice
 
     if [ "$attack_choice" = "0" ]; then
         echo -e "${YELLOW}[*] Returning to target selection...${NC}"
@@ -1001,7 +993,7 @@ attack_wps() {
     echo -e "${YELLOW}[*] Select Reaver attack mode:${NC}"
     echo -e "  ${GREEN}[1]${NC} Normal         — standard PIN brute force"
     echo -e "  ${GREEN}[2]${NC} Aggressive     — faster, more likely to trigger lockout"
-    echo -e "  ${GREEN}[3]${NC] Pixie Dust     — fast attack, works on vulnerable chipsets only"
+    echo -e "  ${GREEN}[3]${NC} Pixie Dust     — fast attack, works on vulnerable chipsets only"
     read -p "Select [1-3]: " reaver_mode
 
     echo -e "\n${YELLOW}[*] Starting Reaver — this can take minutes to hours${NC}"
@@ -1545,9 +1537,8 @@ crack_with_wordlists() {
     echo -e "  ${GREEN}[1]${NC} Aircrack-ng     — CPU, works directly on .cap"
     echo -e "  ${GREEN}[2]${NC} Hashcat          — GPU accelerated, much faster"
     echo -e "  ${GREEN}[3]${NC} Both             — try aircrack first, hashcat if not found"
-    echo -e "  ${GREEN}[4]${NC} Compare wordlists — benchmark all wordlists against target"
     echo -e "  ${GREEN}[0]${NC} Back\n"
-    read -p "Select [0-4]: " crack_method
+    read -p "Select [0-3]: " crack_method
 
     case $crack_method in
         0)
@@ -1569,9 +1560,6 @@ crack_with_wordlists() {
                 local hc_file="${converted:-$hash_file}"
                 crack_with_hashcat "$hc_file" "$hash_type"
             fi
-            ;;
-        4)
-            compare_wordlists "$hash_file" "$hash_type"
             ;;
         *)
             echo -e "${RED}[!] Invalid selection${NC}"
